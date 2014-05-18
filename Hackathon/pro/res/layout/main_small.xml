@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#666666"
+    android:orientation="vertical"
+    android:id="@+id/outsideLayout" >
+
+    
+    <FrameLayout
+        android:id="@+id/mBottomPhotoFrameLayout"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="@dimen/window_width"
+        android:layout_height="@dimen/window_height"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/window_frame_width" >
+
+        <SurfaceView
+            android:id="@+id/mSurfaceView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="visible" >
+        </SurfaceView>
+     
+        <LinearLayout
+            android:id="@+id/myMidLayout"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal" >
+         
+	            <FrameLayout 
+	                android:layout_width="@dimen/left_window_width"
+	                android:layout_height="fill_parent"
+	                android:orientation="vertical"
+	                android:id="@+id/myImageLayoutLeft"
+	                >
+
+	            <ImageView
+	                android:id="@+id/myImageStaticLeft"
+	                android:layout_width="fill_parent"
+	                android:layout_height="fill_parent"
+	                />
+	            
+	             <ImageView
+	                 android:id="@+id/first"
+		                android:layout_width="@dimen/label_size"
+		                android:layout_height="@dimen/label_size"
+		                android:src="@drawable/first"
+		                android:layout_gravity="center_horizontal"/>
+	             <Button
+		            android:id="@+id/buttonYes"
+		            android:layout_width="@dimen/yes_no_size"
+		            android:layout_height="@dimen/yes_no_size"
+		            android:visibility="invisible"
+		            android:background="@drawable/yes"
+		            android:layout_gravity="right"
+		            android:layout_marginRight="@dimen/yes_no_margin_horizon"
+		            android:layout_marginTop="@dimen/yes_no_margin_top" />
+		          <Button
+		            android:id="@+id/buttonNo"
+		            android:layout_width="@dimen/yes_no_size"
+		            android:layout_height="@dimen/yes_no_size"
+		            android:visibility="invisible"
+		            android:layout_marginTop="@dimen/yes_no_margin_top"
+		            android:layout_gravity="left"
+		            android:layout_marginLeft="@dimen/yes_no_margin_horizon"
+		            android:background="@drawable/no" />
+	            
+            </FrameLayout>
+            
+            <FrameLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/myImageLayoutRight"
+                android:layout_width="@dimen/left_window_width"
+                android:layout_height="fill_parent"
+                android:orientation="vertical" >
+
+                
+
+                <ImageView
+                    android:id="@+id/myImageStaticRight"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/shadow" 
+                    android:scaleType="matrix"/>
+                
+                  <ImageView
+                      	android:id="@+id/second"
+		                android:layout_width="@dimen/label_size"
+		                android:layout_height="@dimen/label_size"
+		                android:src="@drawable/second"
+		                android:layout_gravity="center_horizontal"/>
+                  <ImageView
+                    android:id="@+id/myImageViewFloat"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="center" />
+            </FrameLayout>
+        </LinearLayout>
+        
+        
+        
+        
+   
+        <Button
+            android:id="@+id/myButton3"
+            android:layout_width="@dimen/take_photo_size"
+            android:layout_height="@dimen/take_photo_size"
+            android:layout_marginTop="@dimen/take_photo_margin_top"
+            android:layout_marginLeft="@dimen/take_photo_magin_horizon"
+            android:drawableTop="@drawable/photobutton"
+            android:background="@android:color/transparent" />
+        <TextView 
+            android:id="@+id/nextText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/yes_no_margin_top"
+            android:layout_marginLeft="@dimen/take_photo_magin_horizon"
+            android:textColor="@android:color/white"
+            android:background="@drawable/textedge"/>
+        
+          <Button 
+            android:id="@+id/redbiankuang"
+            android:layout_width="50dp"
+            android:layout_height="fill_parent"
+            android:background="@drawable/redbiankuang"
+            android:visibility="invisible"/>
+          
+    </FrameLayout>
+
+    
+ 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        
+
+        <Button
+            android:id="@+id/myButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_button2" 
+            android:visibility="gone"/>
+
+        
+      
+    </LinearLayout>
+
+   
+</LinearLayout>

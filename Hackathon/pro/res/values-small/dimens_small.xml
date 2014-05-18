@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+<!-- 
+<dimen name="window_width">600dip</dimen> 
+<dimen name="window_height">400dip</dimen>   
+<dimen name="window_frame_width">10dip</dimen>    
+
+<dimen name="left_window_width">300dip</dimen> 
+
+<dimen name="label_size">20dip</dimen> 
+ 
+<dimen name="yes_no_size">50dip</dimen>
+<dimen name="yes_no_margin_top">400dip</dimen>
+<dimen name="yes_no_margin_horizon">400dip</dimen>
+
+<dimen name="take_photo_size">80dip</dimen>
+<dimen name="take_photo_margin_top">100dip</dimen>
+<dimen name="take_photo_magin_horizon">350dip</dimen>
+
+<dimen name="final_yes_margin_top">150dip</dimen>
+<dimen name="final_no_margin_top">300dip</dimen>
+
+
+<dimen name="progress_bar_size">40dip</dimen>
+values-hdpi 480X800 -->  
+</resources>  
+

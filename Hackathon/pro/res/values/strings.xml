@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello , we are hackers!</string>
+    <string name="app_name">合影相机</string>
+    
+    <string name="str_button2">下一个人的拍摄区域</string>
+    <string name="str_take_picture">拍照</string>
+    <string name="str_err_nosd">※未发信安装SD存储卡※</string>
+
+    
+    
+    <string name="nexttext">第二个人的拍摄位置</string>
+    <string name="qrnext">确认后开始拍摄第二个人</string>
+    
+</resources>
