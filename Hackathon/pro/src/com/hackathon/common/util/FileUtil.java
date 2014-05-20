@@ -15,9 +15,7 @@ public class FileUtil {
 	private static String TAG = "FileUtil";
 	private static String root_dir = Environment.getExternalStorageDirectory()
 			+ "/high_camera";
-
-	// private String final_left = root_dir + "/final_left.jpg";
-	// private String final_right = root_dir + "/final_right.jpg";
+	private static String schedul_path = "schedul.txt";
 
 	public static String getFilePathByType(String type) {
 		String path = root_dir;
@@ -35,6 +33,10 @@ public class FileUtil {
 			path += "/camera_final_right.jpg";
 		else if ("final_tmp".equals(type))
 			path += "/camera_final_left_Proc.jpg";
+		else if ("final_left_tmp".equals(type))
+			path += "/camera_final_left_tmp.jpg";
+		else if ("final_right_tmp".equals(type))
+			path += "/camera_final_right_tmp.jpg";
 		else if ("final".equals(type))
 			path += "/final_"+ System.currentTimeMillis()+".jpg";
 		else
@@ -112,6 +114,13 @@ public class FileUtil {
 		}
 	}
 
+	
+	public static void readSchedule()
+	{
+		
+		
+	}
+	
 //	public static void memoryImages() {
 //		Bitmap target_whole = loadBitmapFromFile("whole");
 //		Bitmap target_cur = Bitmap.createBitmap(target_whole, 0,0, curFrameX - viewX + dx, imageSizeY);

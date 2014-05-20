@@ -51,7 +51,8 @@ public class HachathonFinalImageActivity extends Activity {
 	private FrameLayout myImageLayoutLeft;
 
 	private HkWindow finalImageWindow;
-	private int morePix = 200;
+//	private int morePix = 200;
+	private float moreScale = (float) 0.08;
 	/* ImageViewRight onToach */
 	// boolean isFit = false;
 	Matrix matrix = new Matrix();
@@ -86,22 +87,33 @@ public class HachathonFinalImageActivity extends Activity {
 		Bundle bundle = getIntent().getExtras();
 		finalImageWindow = (HkWindow) bundle.getSerializable("HkWindow");
 
-		// Toast.makeText(getApplicationContext(), "in final image",
-		// 100).show();
-
+		//set control size
 		LinearLayout.LayoutParams paramLeft = (LinearLayout.LayoutParams) myImageLayoutLeft
 				.getLayoutParams();
 		paramLeft.width = finalImageWindow.curFrameX - finalImageWindow.viewX;
 		myImageLayoutLeft.setLayoutParams(paramLeft);
 		LinearLayout.LayoutParams paramRight = (LinearLayout.LayoutParams) myImageFinalRight
 				.getLayoutParams();
-		paramRight.width = finalImageWindow.viewWidth + finalImageWindow.viewX
+		int right_width =  finalImageWindow.viewWidth + finalImageWindow.viewX
 				- finalImageWindow.curFrameX;
+		int right_height = finalImageWindow.viewHeight;
+		paramRight.width = right_width;
 		myImageFinalRight.setLayoutParams(paramRight);
+		
+		//calculate image size to fit the right imageview
 		Bitmap whole_image = FileUtil.loadBitmapFromFile("whole");
-		Bitmap right_image = FileUtil.loadBitmapFromFile("right");
+		Bitmap tmp_image = FileUtil.loadBitmapFromFile("right");
+		float width_scale = (float)right_width /(float)tmp_image.getWidth();
+		float height_scale = (float)right_height / (float)tmp_image.getHeight() ;
+		Matrix tmp_matrix = new Matrix();
+		tmp_matrix.postScale(width_scale, height_scale);
+		Bitmap right_image = Bitmap.createBitmap(tmp_image, 0, 0, tmp_image.getWidth(), tmp_image.getHeight(), tmp_matrix, true);
+		
 		myImageFinalDown.setImageBitmap(whole_image);
 		myImageFinalRight.setImageBitmap(right_image);
+		
+		
+		
 		
 		// myImageFinalRight.setImageResource(R.drawable.chunse);
 		myImageFinalRight.setOnTouchListener(new OnTouchListener() {
@@ -112,6 +124,7 @@ public class HachathonFinalImageActivity extends Activity {
 
 				switch (event.getAction() & MotionEvent.ACTION_MASK) {
 				case MotionEvent.ACTION_DOWN:
+					//myImageFinalRight.setScaleType(ScaleType.MATRIX);
 					savedMatrix.set(matrix);
 					prev.set(event.getX(), event.getY());
 					mode = DRAG;
@@ -154,14 +167,20 @@ public class HachathonFinalImageActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 
-				ProcessThread thread = new ProcessThread();
-				thread.start();
+				
 				//切换状态
 				setStatus("save");
 				
 				getProcessPicture();
 				
 				generateFinalImage();
+
+//				progressBar.setVisibility(View.VISIBLE);
+//				ProcessThread thread = new ProcessThread();
+//				thread.start();
+				
+				Bitmap result = FileUtil.loadBitmapFromFile("final_tmp");
+				myImageFinalDown.setImageBitmap(result);
 
 			}
 		});
@@ -230,16 +249,16 @@ public class HachathonFinalImageActivity extends Activity {
 		public void run() {
 			// TODO Auto-generated method stub
 			super.run();
-			try {
-
-				sleep(1000);
-
-			} catch (InterruptedException e) {
-
-				e.printStackTrace();
-
-			}
-			handler.sendEmptyMessage(0);
+			Message msg = new Message();
+			msg.what = 0;
+			handler.sendMessage(msg);
+			//handler.sendEmptyMessage(0);
+			generateFinalImage();
+				
+			//handler.sendEmptyMessage(1);
+			Message msg1 = new Message();
+			msg1.what = 1;
+			handler.sendMessage(msg1);
 		}
 	}
 
@@ -247,11 +266,26 @@ public class HachathonFinalImageActivity extends Activity {
 
 		@Override
 		public void handleMessage(Message msg) {
+			
+			switch (msg.what) {
+		
+			case 0:
+				Toast.makeText(getApplicationContext(), "what : " + msg.what, 100).show();
+				progressBar.setProgress(10);
+				break;
+			case 1:
+				Toast.makeText(getApplicationContext(), "what : " + msg.what, 100).show();
+				// 关闭ProgressDialog
+				progressBar.setVisibility(View.GONE);
+				buttonBottomSave.setVisibility(View.VISIBLE);
+				buttonBottomCancel.setVisibility(View.VISIBLE);
+				break;
 
-			// 关闭ProgressDialog
-			progressBar.setVisibility(View.GONE);
-			buttonBottomSave.setVisibility(View.VISIBLE);
-			buttonBottomCancel.setVisibility(View.VISIBLE);
+			default:
+				break;
+			}
+			super.handleMessage(msg);
+			
 		}
 	};
 
@@ -278,6 +312,7 @@ public class HachathonFinalImageActivity extends Activity {
 		// calculate left image size
 		int x_left = 0;
 		int y_left = (image_dy < 0) ? 0 : image_dy;
+		int morePix = (int)(tmp_left.getWidth() * moreScale);
 		int width_left = finalImageWindow.curFrameX - finalImageWindow.viewX
 				+ ((image_dx>0)?image_dx:0) + morePix;
 		if (width_left > finalImageWindow.viewWidth)
@@ -335,24 +370,40 @@ public class HachathonFinalImageActivity extends Activity {
 		Canvas canvas = new Canvas(result);
 		canvas.drawBitmap(final_left, new Matrix(), null);
 		canvas.drawBitmap(final_right, final_left.getWidth(), 0, null);
-		FileUtil.memoryOneImage(result, "final");
+		FileUtil.memoryOneImage(result, "final_tmp");
 		
-		myImageFinalDown.setImageBitmap(result);
+		//myImageFinalDown.setImageBitmap(result);
 	}
 	
 	private void generateFinalImage()
 	{
-		 String fileName1 = FileUtil.getFilePathByType("final_left") ;
-		 String fileName2 = FileUtil.getFilePathByType("final_right") ;
+//		Bitmap tmp_left  = FileUtil.loadBitmapFromFile("final_left");
+//		Bitmap tmp_right = FileUtil.loadBitmapFromFile("final_right");
+//		int left_width_half = tmp_left.getWidth() / 2;
+//		int right_width_half = tmp_right.getWidth() / 2;
+//		Bitmap part1 = Bitmap.createBitmap(tmp_left , 0, 0 , left_width_half, tmp_left.getHeight());
+//		Bitmap part2 = Bitmap.createBitmap(tmp_left,left_width_half, 0, left_width_half, tmp_left.getHeight() );
+//		Bitmap part3 = Bitmap.createBitmap(tmp_right, 0, 0, right_width_half, tmp_right.getHeight());
+//		Bitmap part4 = Bitmap.createBitmap(tmp_right,right_width_half, 0,right_width_half, tmp_right.getHeight());
+//		FileUtil.memoryOneImage(part2, "final_left_tmp");
+//		FileUtil.memoryOneImage(part3, "final_right_tmp");
+		
+//		String fileName1 = FileUtil.getFilePathByType("final_left_tmp");
+//		 String fileName2 = FileUtil.getFilePathByType("final_right_tmp");
+		
+		String fileName1 = FileUtil.getFilePathByType("final_left");
+		 String fileName2 = FileUtil.getFilePathByType("final_right");
 		 int ret = SiftFun.siftConjunction(fileName1, fileName2);
-		 Toast.makeText(getApplicationContext(), "conjunction finished : " + ret, 100).show();
+		 //Toast.makeText(getApplicationContext(), "conjunction finished : " + ret, 100).show();
 		 if (ret != 0)
 			 generateFinalImage_directly();
-		 else
-		 {
-			 Bitmap result = FileUtil.loadBitmapFromFile("final_tmp");
-			 myImageFinalDown.setImageBitmap(result);
-		 }
+//		 else
+//		 {
+//			 //Bitmap result = FileUtil.loadBitmapFromFile("final_tmp");
+//			// myImageFinalDown.setImageBitmap(result);
+//			 
+//			 //conjuction part1 and part4
+//		 }
 	}
 	
 	

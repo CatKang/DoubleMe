@@ -59,6 +59,13 @@
                     android:layout_height="fill_parent"
                     
                     android:scaleType="fitXY" />
+                <ImageView
+                    android:id="@+id/imageXiangji"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:src="@drawable/xiangji" />
                 <Button
 			        android:id="@+id/rightYesButton"
 			        android:layout_width="70dp"

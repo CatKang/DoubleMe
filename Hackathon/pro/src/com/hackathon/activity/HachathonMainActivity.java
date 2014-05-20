@@ -50,6 +50,7 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView leftImage;
 	private ImageView rightImage;
 	private ImageView floatImage;
+	private ImageView xiangjiImage;
 	private Button noButton;
 	private Button rightYesButton;
 	private Button rightNoButton;
@@ -71,6 +72,7 @@ public class HachathonMainActivity extends Activity implements
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
 
+		FileUtil.init_file_env();
 		screenWidth = getWindowManager().getDefaultDisplay().getWidth();
 		screenHeight = getWindowManager().getDefaultDisplay().getHeight();
 
@@ -78,13 +80,10 @@ public class HachathonMainActivity extends Activity implements
 		Button takephotoButton = (Button) findViewById(R.id.takephotoButton);
 		noButton = (Button) findViewById(R.id.noButton);
 
-		// Toast.makeText(this, (screenWidth + "  " + screenHeight),
-		// Toast.LENGTH_LONG).show();
 		takephotoButton.setX(screenWidth - 180);
 		takephotoButton.setY((screenHeight - 50) / 2 - 50);
 
 		takephotoButton.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -144,6 +143,8 @@ public class HachathonMainActivity extends Activity implements
 		text = (TextView) findViewById(R.id.text);
 		rightYesButton = (Button)findViewById(R.id.rightYesButton);
 		rightNoButton = (Button)findViewById(R.id.rightNoButton);
+		
+		xiangjiImage = (ImageView)findViewById(R.id.imageXiangji);
 	}
 
 	@Override
@@ -230,6 +231,7 @@ public class HachathonMainActivity extends Activity implements
 
 				leftImage.setVisibility(View.VISIBLE);
 				leftImage.setImageBitmap(targetbm_left);
+				xiangjiImage.setVisibility(View.VISIBLE);
 				rightImage.setBackgroundColor(Color.GRAY);
 				rightImage.setVisibility(View.VISIBLE);
 				noButton.setVisibility(View.VISIBLE);
@@ -246,6 +248,7 @@ public class HachathonMainActivity extends Activity implements
 						rightImage.setVisibility(View.VISIBLE);
 						rightImage.setBackgroundResource(R.drawable.shadow);
 						floatImage.setVisibility(View.INVISIBLE);
+						xiangjiImage.setVisibility(View.GONE);
 						flag = 0;
 						can_drag = true;
 						camera.startPreview();

@@ -37,7 +37,6 @@
                    />
             </FrameLayout>
             
-            
 
                 <ImageView
                     android:id="@+id/myImageFinalRight"
@@ -67,10 +66,12 @@
           
           <ProgressBar 
               android:id="@+id/progressBar"
-              android:layout_width="50dp"
+              android:layout_width="200dp"
               android:layout_height="50dp"
               android:background="@android:color/transparent"
               android:layout_gravity="center"
+              android:max="100"  
+        		style="@android:style/Widget.ProgressBar.Horizontal"
               android:visibility="gone"/>
                  
           <Button
