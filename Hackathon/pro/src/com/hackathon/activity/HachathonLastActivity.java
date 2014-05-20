@@ -4,6 +4,7 @@ import com.hackathon.common.util.FileUtil;
 import com.hackathon.main.R;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
@@ -33,10 +34,11 @@ public class HachathonLastActivity extends Activity {
 	  
 	    
 	    
-	    continueImage.setOnClickListener(new OnClickListener(){
+	    continueText.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
+				startActivity(new Intent(HachathonLastActivity.this,HachathonFirstActivity.class));
 				// TODO Auto-generated method stub
 //				mBottomPhotoFrameLayout.setVisibility(View.VISIBLE);
 //				buttonBottomSave.setVisibility(View.INVISIBLE);

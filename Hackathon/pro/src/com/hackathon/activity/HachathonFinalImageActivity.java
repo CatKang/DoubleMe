@@ -74,8 +74,10 @@ public class HachathonFinalImageActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//requestWindowFeature(Window.FEATURE_PROGRESS);
 		setContentView(R.layout.final_image);
-
+		//setProgressBarVisibility(true);
+		
 		buttonRightYes = (Button) findViewById(R.id.buttonRightYes);
 		buttonRightNo = (Button) findViewById(R.id.buttonRightNo);
 		buttonBottomSave = (Button) findViewById(R.id.buttonBottomSave);
@@ -169,19 +171,37 @@ public class HachathonFinalImageActivity extends Activity {
 
 				
 				//切换状态
-				setStatus("save");
 				
 				getProcessPicture();
-				
-				generateFinalImage();
+				setStatus("process");
 
-//				progressBar.setVisibility(View.VISIBLE);
-//				ProcessThread thread = new ProcessThread();
-//				thread.start();
+				ProcessThread thread = new ProcessThread();
+				thread.start();
+						
+				Toast.makeText(getApplicationContext(), "UI finished", 100).show();
+				//int cur_phase = 1;
 				
-				Bitmap result = FileUtil.loadBitmapFromFile("final_tmp");
-				myImageFinalDown.setImageBitmap(result);
-
+//				while(cur_phase++<10){
+//					Message msg = new Message();
+//					Toast.makeText(getApplicationContext(), "UI finished" + cur_phase, 100).show();
+//					msg.what = (cur_phase == 9) ? cur_phase : cur_phase++;
+//					handler.sendMessage(msg);
+//					}
+//				while(!finished)
+//				{
+//					Message msg = new Message();
+//					msg.what = (cur_phase == 9) ? cur_phase : cur_phase++;
+//					//handler.sendMessage(msg);
+//					
+//					try {
+//						Thread.sleep(500);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					
+//				}
+				
 			}
 		});
 		buttonRightNo.setOnClickListener(new OnClickListener() {
@@ -229,62 +249,75 @@ public class HachathonFinalImageActivity extends Activity {
 			buttonBottomSave.setVisibility(View.INVISIBLE);
 			buttonBottomCancel.setVisibility(View.INVISIBLE);
 			Bitmap whole = FileUtil.loadBitmapFromFile("whole");
-			Bitmap final_right = FileUtil.loadBitmapFromFile("right");
-			myImageFinalRight.setImageBitmap(final_right);
+			Bitmap right = FileUtil.loadBitmapFromFile("right");
+			myImageFinalRight.setImageBitmap(right);
 			myImageFinalDown.setImageBitmap(whole);
 
-		} else if ("save".equals(input)) {
+		} 
+		else if ("process".equals(input)) {
 			progressBar.setVisibility(View.VISIBLE);
 			buttonRightYes.setVisibility(View.INVISIBLE);
 			buttonRightNo.setVisibility(View.INVISIBLE);
-			myImageFinalRight.setVisibility(View.INVISIBLE);
 
+		}else if ("save".equals(input)) {
+			progressBar.setVisibility(View.INVISIBLE);
+			myImageFinalRight.setVisibility(View.INVISIBLE);
+			progressBar.setVisibility(View.GONE);
+			buttonBottomSave.setVisibility(View.VISIBLE);
+			buttonBottomCancel.setVisibility(View.VISIBLE);
+			Bitmap result = FileUtil.loadBitmapFromFile("final_tmp");
+			myImageFinalDown.setImageBitmap(result);
 		}
 
 	}
 
 	class ProcessThread extends Thread {
-
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
+			//Toast.makeText(getApplicationContext(), "begin new thread", 100).show();
 			super.run();
 			Message msg = new Message();
 			msg.what = 0;
 			handler.sendMessage(msg);
-			//handler.sendEmptyMessage(0);
+
 			generateFinalImage();
-				
-			//handler.sendEmptyMessage(1);
-			Message msg1 = new Message();
-			msg1.what = 1;
-			handler.sendMessage(msg1);
+			
+			msg = new Message();
+			msg.what = -1;
+			handler.sendMessage(msg);
 		}
+		
 	}
 
+	
 	private Handler handler = new Handler() {
 
 		@Override
 		public void handleMessage(Message msg) {
-			
+			super.handleMessage(msg);
 			switch (msg.what) {
 		
 			case 0:
-				Toast.makeText(getApplicationContext(), "what : " + msg.what, 100).show();
-				progressBar.setProgress(10);
+				//begin
+				Toast.makeText(getApplicationContext(), "begin process", 100).show();
+//				progressBar.setProgress(0);
 				break;
-			case 1:
-				Toast.makeText(getApplicationContext(), "what : " + msg.what, 100).show();
+			case -1:
+				//end
+				Toast.makeText(getApplicationContext(), "end process", 100).show();
 				// 关闭ProgressDialog
-				progressBar.setVisibility(View.GONE);
-				buttonBottomSave.setVisibility(View.VISIBLE);
-				buttonBottomCancel.setVisibility(View.VISIBLE);
+				//progressBar.setProgress(100);
+				setStatus("save");
+				
 				break;
 
 			default:
+				Toast.makeText(getApplicationContext(), "what : " + msg.what, 100).show();
+				//progressBar.setProgress(msg.what * 10);
 				break;
 			}
-			super.handleMessage(msg);
+			
 			
 		}
 	};

@@ -117,6 +117,7 @@ public class FileUtil {
 	
 	public static void readSchedule()
 	{
+		//TODO read from file
 		
 		
 	}

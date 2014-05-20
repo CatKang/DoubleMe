@@ -71,7 +71,8 @@
               android:background="@android:color/transparent"
               android:layout_gravity="center"
               android:max="100"  
-        		style="@android:style/Widget.ProgressBar.Horizontal"
+              android:progress="2"
+        		style="@android:attr/progressBarStyleHorizontal"
               android:visibility="gone"/>
                  
           <Button
