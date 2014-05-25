@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.hackathon.common.util.FileUtil;
 import com.hackathon.common.util.GeometryUtil;
 import com.hackathon.entity.HkWindow;
-import com.hackathon.entity.ImageInfo;
+import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
 
 
@@ -53,8 +53,7 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView xiangjiImage;
 	private ImageView moveImage;
 	private Button noButton;
-	private Button rightYesButton;
-	private Button rightNoButton;
+
 	
 	
 	HkWindow curWindow;
@@ -144,8 +143,6 @@ public class HachathonMainActivity extends Activity implements
 		leftImage = (ImageView) findViewById(R.id.imageLeft);
 
 		text = (TextView) findViewById(R.id.text);
-		rightYesButton = (Button)findViewById(R.id.rightYesButton);
-		rightNoButton = (Button)findViewById(R.id.rightNoButton);
 		
 		xiangjiImage = (ImageView)findViewById(R.id.imageXiangji);
 		moveImage = (ImageView)findViewById(R.id.imageMove);
@@ -220,7 +217,7 @@ public class HachathonMainActivity extends Activity implements
 
 			Bitmap bm = BitmapFactory.decodeByteArray(_data, 0, _data.length);
 			if (flag == 1) {
-				ImageInfo sizes = curWindow.getImageSize("left", pictureSize.width,
+				ImageSize sizes = curWindow.getImageSize("left", pictureSize.width,
 						pictureSize.height);
 
 				Bitmap targetbm_left = Bitmap.createBitmap(bm, sizes.x,
@@ -262,7 +259,7 @@ public class HachathonMainActivity extends Activity implements
 					}
 				});
 			} else {
-				ImageInfo sizes = curWindow.getImageSize("right", pictureSize.width,
+				ImageSize sizes = curWindow.getImageSize("right", pictureSize.width,
 						pictureSize.height);
 				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
 						sizes.y, sizes.width, sizes.height);

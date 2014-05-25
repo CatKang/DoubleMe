@@ -8,8 +8,9 @@ import java.util.List;
 import com.LibSift.namespace.SiftFun;
 import com.hackathon.common.util.FileUtil;
 import com.hackathon.common.util.GeometryUtil;
-import com.hackathon.entity.HkWindow;
-import com.hackathon.entity.ImageInfo;
+import com.hackathon.entity.CropFrame;
+import com.hackathon.entity.FinalImageWindow;
+import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
 
 import android.app.Activity;
@@ -28,6 +29,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -47,13 +49,17 @@ public class HachathonFinalImageActivity extends Activity {
 	private Button buttonBottomSave;
 	private Button buttonBottomCancel;
 	private ProgressBar progressBar;
-
-	private FrameLayout myImageLayoutLeft;
-
-	private HkWindow finalImageWindow;
-	//private int morePix = 200;
-	private float moreScale = (float) 0.08;
-	/* ImageViewRight onToach */
+	private FrameLayout myLayoutLeft;
+	private FrameLayout mBottomPhotoFrameLayout;
+	
+	private FinalImageWindow finalImageWindow;
+	public ImageSize cropBox;
+	
+	private float moreScale = (float) 0.08;    //左边图片多给的比例
+	private float remainScale = (float) 0.20;  //右侧边栏的比例
+	private int margin = 60;
+	
+	/* ImageViewRight onTouch */
 	// boolean isFit = false;
 	Matrix matrix = new Matrix();
 	Matrix savedMatrix = new Matrix();
@@ -68,8 +74,9 @@ public class HachathonFinalImageActivity extends Activity {
 	PointF prev = new PointF();
 	PointF mid = new PointF();
 	float dist = 1f;
-
-	/* ImageViewRight onToach */
+	/* ImageViewRight onToch end */
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -85,9 +92,9 @@ public class HachathonFinalImageActivity extends Activity {
 		myImageFinalDown = (ImageView) findViewById(R.id.myImageFinalDown);
 		myImageFinalRight = (ImageView) findViewById(R.id.myImageFinalRight);
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
-		myImageLayoutLeft = (FrameLayout) findViewById(R.id.myImageLayoutLeft);
-		Bundle bundle = getIntent().getExtras();
-		finalImageWindow = (HkWindow) bundle.getSerializable("HkWindow");
+		myLayoutLeft = (FrameLayout) findViewById(R.id.myImageLayoutLeft);
+		mBottomPhotoFrameLayout = (FrameLayout) findViewById(R.id.mBottomPhotoFrameLayout);
+
 
 		setStatus("fit");
 		
@@ -95,12 +102,8 @@ public class HachathonFinalImageActivity extends Activity {
 		myImageFinalRight.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				// if (!isFit)
-				// return false;
-
 				switch (event.getAction() & MotionEvent.ACTION_MASK) {
 				case MotionEvent.ACTION_DOWN:
-					//myImageFinalRight.setScaleType(ScaleType.MATRIX);
 					savedMatrix.set(matrix);
 					prev.set(event.getX(), event.getY());
 					mode = DRAG;
@@ -115,6 +118,7 @@ public class HachathonFinalImageActivity extends Activity {
 					break;
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_POINTER_UP:
+					refreshCropBox();
 					mode = NONE;
 					break;
 				case MotionEvent.ACTION_MOVE:
@@ -133,7 +137,6 @@ public class HachathonFinalImageActivity extends Activity {
 					break;
 				}
 				myImageFinalRight.setImageMatrix(matrix);
-				// CheckView();
 				return true;
 			}
 		});
@@ -210,35 +213,7 @@ public class HachathonFinalImageActivity extends Activity {
 			buttonRightNo.setVisibility(View.VISIBLE);
 			buttonBottomSave.setVisibility(View.INVISIBLE);
 			buttonBottomCancel.setVisibility(View.INVISIBLE);
-//			Bitmap whole = FileUtil.loadBitmapFromFile("whole");
-//			Bitmap right = FileUtil.loadBitmapFromFile("right");
-//			myImageFinalRight.setImageBitmap(right);
-//			myImageFinalDown.setImageBitmap(whole);
-			
-			//set control size
-			LinearLayout.LayoutParams paramLeft = (LinearLayout.LayoutParams) myImageLayoutLeft
-					.getLayoutParams();
-			paramLeft.width = finalImageWindow.curFrameX - finalImageWindow.viewX;
-			myImageLayoutLeft.setLayoutParams(paramLeft);
-			LinearLayout.LayoutParams paramRight = (LinearLayout.LayoutParams) myImageFinalRight
-					.getLayoutParams();
-			int right_width =  finalImageWindow.viewWidth + finalImageWindow.viewX
-					- finalImageWindow.curFrameX;
-			//int right_height = finalImageWindow.viewHeight;
-			paramRight.width = right_width;
-			myImageFinalRight.setLayoutParams(paramRight);
-			
-			//calculate image size to fit the right imageview
-			Bitmap whole_image = FileUtil.loadBitmapFromFile("whole");
-			Bitmap right_image = FileUtil.loadBitmapFromFile("right");
-//			float width_scale = (float)right_width /(float)tmp_image.getWidth();
-//			float height_scale = (float)right_height / (float)tmp_image.getHeight() ;
-//			Matrix tmp_matrix = new Matrix();
-//			tmp_matrix.postScale(width_scale, height_scale);
-//			Bitmap right_image = Bitmap.createBitmap(tmp_image, 0, 0, tmp_image.getWidth(), tmp_image.getHeight(), tmp_matrix, true);
-			
-			myImageFinalDown.setImageBitmap(whole_image);
-			myImageFinalRight.setImageBitmap(right_image);
+			paintFinalImageView();
 
 		} 
 		else if ("process".equals(input)) {
@@ -258,6 +233,76 @@ public class HachathonFinalImageActivity extends Activity {
 
 	}
 
+	private void paintFinalImageView()
+	{
+		Bitmap whole_image = FileUtil.loadBitmapFromFile("whole");
+		Bitmap right_image = FileUtil.loadBitmapFromFile("right");
+		
+		//get width-length radio
+		float wl_radio = (float)whole_image.getWidth() / (float)whole_image.getHeight();
+		
+		//get down image actual size
+		int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
+		int view_width = (int)(screenWidth * (1 - remainScale)) - 2 * margin;
+		int view_height = (int)((float)view_width / wl_radio);
+
+		
+		float shrink_radio =  (float)view_width / (float)whole_image.getWidth() ;
+		
+		//get right image actual size
+		int right_view_width = (int)(right_image.getWidth() * shrink_radio);
+		
+		//get left layout actual size
+		int left_view_width = view_width - right_view_width;
+		
+		//initial FinalImageWindow
+		finalImageWindow = new FinalImageWindow(margin, margin, view_width, view_height);
+		finalImageWindow.leftWidth = left_view_width;
+		cropBox = new ImageSize(margin, margin, view_width, view_height);
+		
+		//get image
+		Matrix right_matrix = new Matrix();
+		right_matrix.postScale(shrink_radio, shrink_radio);
+		Bitmap tmp_right_image = Bitmap.createBitmap(right_image, 0, 0, right_image.getWidth(), right_image.getHeight(), right_matrix, true);
+		Matrix whole_matrix = new Matrix();
+		whole_matrix.postScale(shrink_radio, shrink_radio);
+		Bitmap tmp_whole_image = Bitmap.createBitmap(whole_image, 0, 0, whole_image.getWidth(), whole_image.getHeight(), whole_matrix, true);
+		
+		//paint this three view
+		LinearLayout.LayoutParams parameterDown = new LinearLayout.LayoutParams(view_width, view_height);
+		parameterDown.leftMargin = parameterDown.topMargin = margin;
+		mBottomPhotoFrameLayout.setLayoutParams(parameterDown);
+		myImageFinalRight.setLayoutParams(new LinearLayout.LayoutParams(right_view_width, view_height));
+		myLayoutLeft.setLayoutParams(new LinearLayout.LayoutParams(left_view_width,view_height));
+		
+		myImageFinalDown.setImageBitmap(tmp_whole_image);
+		myImageFinalRight.setImageBitmap(tmp_right_image);
+		
+		//paint crop box
+		paintCropBox();
+	}
+	
+
+	
+	private void refreshCropBox()
+	{	
+		myImageFinalRight.setDrawingCacheEnabled(true);
+		Bitmap tmp_right = myImageFinalRight.getDrawingCache();
+		List<ImageSize> sizes = ImageProjection(tmp_right.getWidth(), tmp_right.getHeight());
+		ImageSize size_left = sizes.get(0);
+		ImageSize size_right = sizes.get(1);
+		myImageFinalRight.setDrawingCacheEnabled(false);
+		int morePix = (int)(finalImageWindow.viewWidth * moreScale);
+		cropBox.change(size_left.x, size_left.y, size_left.width - morePix + size_right.width, size_right.height);
+		paintCropBox();
+	}
+	
+	private void paintCropBox()
+	{
+		Toast.makeText(getApplicationContext(), cropBox.x + "," + cropBox.y + ", "+ cropBox.width + ", "+ cropBox.height , 500).show();
+		
+	}
+	
 	class ProcessThread extends Thread {
 		@Override
 		public void run() {
@@ -310,6 +355,35 @@ public class HachathonFinalImageActivity extends Activity {
 	};
 
 	private void getProcessPicture() {
+		
+		myImageFinalDown.setDrawingCacheEnabled(true);
+		myImageFinalRight.setDrawingCacheEnabled(true);
+		Bitmap tmp_left = myImageFinalDown.getDrawingCache();
+		Bitmap tmp_right = myImageFinalRight.getDrawingCache();
+
+		//get image size
+		List<ImageSize> sizes = ImageProjection(tmp_right.getWidth(), tmp_right.getHeight());
+		ImageSize size_left = sizes.get(0);
+		ImageSize size_right = sizes.get(1);
+
+		// generate image
+		Bitmap target_left = Bitmap.createBitmap(tmp_left, size_left.x, size_left.y,
+				size_left.width, size_left.height);
+		FileUtil.memoryOneImage(target_left, "final_left");
+
+		Bitmap target_right = Bitmap.createBitmap(tmp_right, size_right.x, size_right.y,
+				size_right.width, size_right.height);
+		FileUtil.memoryOneImage(target_right, "final_right");
+		
+		myImageFinalRight.setDrawingCacheEnabled(false);
+		myImageFinalDown.setDrawingCacheEnabled(false);
+		
+	}
+	
+	
+	private List<ImageSize> ImageProjection(int rwidth, int rheight) {
+		
+		List<ImageSize> result = new ArrayList<ImageSize>();
 		int dw = myImageFinalRight.getDrawable().getBounds().width();
 		int dh = myImageFinalRight.getDrawable().getBounds().height();
 		Matrix m = myImageFinalRight.getImageMatrix();
@@ -322,63 +396,39 @@ public class HachathonFinalImageActivity extends Activity {
 		int image_dy = (int) values[5];
 		int image_width = (int) (dw * sx);
 		int image_height = (int) (dh * sy);
-
-		Bitmap tmp_left = FileUtil.loadBitmapFromFile("whole");
-		myImageFinalRight.setDrawingCacheEnabled(true);
-		//Bitmap right = FileUtil.loadBitmapFromFile("right");
-		//Bitmap tmp_right = Bitmap.createBitmap(right, 0, 0, right.getWidth(), right.getHeight(), m, true); 
-		Bitmap tmp_right = myImageFinalRight.getDrawingCache();
-
+		
 		// calculate left image size
 		int x_left = 0;
 		int y_left = (image_dy < 0) ? 0 : image_dy;
-		int morePix = (int)(finalImageWindow.viewWidth * moreScale);
-		int width_left = finalImageWindow.curFrameX - finalImageWindow.viewX
-				+ ((image_dx>0)?image_dx:0) + morePix;
+		int morePix = (int) (finalImageWindow.viewWidth * moreScale);
+		int width_left = finalImageWindow.leftWidth
+				+ ((image_dx > 0) ? image_dx : 0) + morePix;
 		if (width_left > finalImageWindow.viewWidth)
 			width_left = finalImageWindow.viewWidth;
+		
 		// calculate right image size
 		int x_right = (image_dx > 0) ? image_dx : 0;
 		int y_right = (image_dy > 0) ? image_dy : 0;
-		int width_right = (image_dx > 0) ? image_width : (image_width + image_dx);
-		if (image_width + image_dx > tmp_right.getWidth())
-			width_right = tmp_right.getWidth() - image_dx;
-		int height_right = (image_dy > 0) ? image_height :( image_height + image_dy);
-		if (height_right + image_dy > tmp_right.getHeight())
-			height_right = tmp_right.getHeight() - image_dy;
+		int width_right = (image_dx > 0) ? image_width
+				: (image_width + image_dx);
+		if (image_width + image_dx > rwidth)
+			width_right = rwidth - image_dx;
+		int height_right = (image_dy > 0) ? image_height
+				: (image_height + image_dy);
+		if (height_right + image_dy > rheight)
+			height_right = rheight - image_dy;
 		int height_left = height_right;
 
-		// generate image
-		Bitmap target_left = Bitmap.createBitmap(tmp_left, x_left, y_left,
-				width_left, height_left);
-		FileUtil.memoryOneImage(target_left, "final_left");
+		ImageSize size_left = new ImageSize(x_left, y_left, width_left, height_left);
+		ImageSize size_right = new ImageSize(x_right, y_right, width_right, height_right);
 
-		Bitmap target_right = Bitmap.createBitmap(tmp_right, x_right, y_right,
-				width_right, height_right);
-		FileUtil.memoryOneImage(target_right, "final_right");
-		
-		myImageFinalRight.setDrawingCacheEnabled(false);
-		// if (image_height + image_dy > target_right.getHeight())
-		// image_height = target_right.getHeight() - image_dy;
+		result.add(size_left);
+		result.add(size_right);
+		return result;
 
-		// int height_left = finalImageWindow.viewHeight - image_dy;
-
-		// if(height_left > image_height)
-		// height_left = image_height;
-		// int width_left = curFrameX - viewX + image_dx + morePix;
-
-		// if (y_left + width_left > target_left.getWidth())
-		// width_left = target_left.getWidth() - y_left;
-
-		// Bitmap target_right =
-		// BitmapFactory.decodeFile(strCaptureFilePathRight);
-		
-		//int curFrame[]
-//		cutFrame[0] = viewX;
-//		cutFrame[1] = viewY + y_left;
-//		cutFrame[2] = viewX + width_left + image_width + image_dx;
-//		cutFrame[3] = viewY + y_left + height_left;
 	}
+	
+	
 	
 	private void generateFinalImage_directly()
 	{
@@ -417,9 +467,9 @@ public class HachathonFinalImageActivity extends Activity {
 		
 		String fileName1 = FileUtil.getFilePathByType("final_left");
 		 String fileName2 = FileUtil.getFilePathByType("final_right");
-		 int ret = SiftFun.siftConjunction(fileName1, fileName2);
+		 //int ret = SiftFun.siftConjunction(fileName1, fileName2);
 		 //Toast.makeText(getApplicationContext(), "conjunction finished : " + ret, 100).show();
-		 if (ret != 0)
+		 //if (ret != 0)
 			 generateFinalImage_directly();
 //		 else
 //		 {

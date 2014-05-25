@@ -50,13 +50,13 @@ public class HkWindow implements Serializable{
 		return false;
 	}
 
-	public ImageInfo getImageSize(String type, int imageSizeX, int imageSizeY) {
-		ImageInfo image = null;
+	public ImageSize getImageSize(String type, int imageSizeX, int imageSizeY) {
+		ImageSize image = null;
 		int mid = (int) ((float) (curFrameX - viewX) / (float) viewWidth * imageSizeX);
 		if ("left".equals(type)) {
-			image = new ImageInfo(0, 0, mid, imageSizeY);
+			image = new ImageSize(0, 0, mid, imageSizeY);
 		} else if ("right".equals(type)) {
-			image = new ImageInfo(mid, 0, imageSizeX - mid, imageSizeY);
+			image = new ImageSize(mid, 0, imageSizeX - mid, imageSizeY);
 		}
 		return image;
 	}

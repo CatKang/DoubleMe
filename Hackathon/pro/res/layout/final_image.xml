@@ -11,8 +11,7 @@
   <FrameLayout
         android:id="@+id/mBottomPhotoFrameLayout"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-         >
+        android:layout_height="fill_parent" >
         <ImageView
                 android:id="@+id/myImageFinalDown"
                 android:layout_width="fill_parent"
@@ -30,10 +29,7 @@
 	                android:orientation="vertical"
 	                android:id="@+id/myImageLayoutLeft"
 	                >
-	            <ImageView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                   />
+	           
             </FrameLayout>
             
 
@@ -41,7 +37,6 @@
                     android:id="@+id/myImageFinalRight"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-          			
                     android:scaleType="matrix"
                     />
 
