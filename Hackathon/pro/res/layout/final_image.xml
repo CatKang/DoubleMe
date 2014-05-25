@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#666666"
+    android:background="#303030"
     android:orientation="horizontal"
     android:id="@+id/outsideLayout" >
 
@@ -12,12 +12,11 @@
         android:id="@+id/mBottomPhotoFrameLayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_margin="10dp" >
+         >
         <ImageView
                 android:id="@+id/myImageFinalDown"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:scaleType="fitXY"
                  />  
                       
         <LinearLayout
@@ -42,7 +41,7 @@
                     android:id="@+id/myImageFinalRight"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-          			android:gravity="right"
+          			
                     android:scaleType="matrix"
                     />
 

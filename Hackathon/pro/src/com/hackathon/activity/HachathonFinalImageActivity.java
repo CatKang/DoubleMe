@@ -51,7 +51,7 @@ public class HachathonFinalImageActivity extends Activity {
 	private FrameLayout myImageLayoutLeft;
 
 	private HkWindow finalImageWindow;
-//	private int morePix = 200;
+	//private int morePix = 200;
 	private float moreScale = (float) 0.08;
 	/* ImageViewRight onToach */
 	// boolean isFit = false;
@@ -89,35 +89,9 @@ public class HachathonFinalImageActivity extends Activity {
 		Bundle bundle = getIntent().getExtras();
 		finalImageWindow = (HkWindow) bundle.getSerializable("HkWindow");
 
-		//set control size
-		LinearLayout.LayoutParams paramLeft = (LinearLayout.LayoutParams) myImageLayoutLeft
-				.getLayoutParams();
-		paramLeft.width = finalImageWindow.curFrameX - finalImageWindow.viewX;
-		myImageLayoutLeft.setLayoutParams(paramLeft);
-		LinearLayout.LayoutParams paramRight = (LinearLayout.LayoutParams) myImageFinalRight
-				.getLayoutParams();
-		int right_width =  finalImageWindow.viewWidth + finalImageWindow.viewX
-				- finalImageWindow.curFrameX;
-		int right_height = finalImageWindow.viewHeight;
-		paramRight.width = right_width;
-		myImageFinalRight.setLayoutParams(paramRight);
-		
-		//calculate image size to fit the right imageview
-		Bitmap whole_image = FileUtil.loadBitmapFromFile("whole");
-		Bitmap tmp_image = FileUtil.loadBitmapFromFile("right");
-		float width_scale = (float)right_width /(float)tmp_image.getWidth();
-		float height_scale = (float)right_height / (float)tmp_image.getHeight() ;
-		Matrix tmp_matrix = new Matrix();
-		tmp_matrix.postScale(width_scale, height_scale);
-		Bitmap right_image = Bitmap.createBitmap(tmp_image, 0, 0, tmp_image.getWidth(), tmp_image.getHeight(), tmp_matrix, true);
-		
-		myImageFinalDown.setImageBitmap(whole_image);
-		myImageFinalRight.setImageBitmap(right_image);
+		setStatus("fit");
 		
 		
-		
-		
-		// myImageFinalRight.setImageResource(R.drawable.chunse);
 		myImageFinalRight.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -168,10 +142,7 @@ public class HachathonFinalImageActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-
-				
 				//切换状态
-				
 				getProcessPicture();
 				setStatus("process");
 
@@ -179,8 +150,7 @@ public class HachathonFinalImageActivity extends Activity {
 				thread.start();
 						
 				Toast.makeText(getApplicationContext(), "UI finished", 100).show();
-				//int cur_phase = 1;
-				
+				//int cur_phase = 1;			
 //				while(cur_phase++<10){
 //					Message msg = new Message();
 //					Toast.makeText(getApplicationContext(), "UI finished" + cur_phase, 100).show();
@@ -208,29 +178,21 @@ public class HachathonFinalImageActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-
-				// 发回上一个界面
-				// TODO Auto-generated method stub
-				// resetCamera();
-//				Intent intent = new Intent();
-//				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//				intent.setClass(HachathonFinalImageActivity.this, HachathonMainActivity.class);
-//				startActivity(intent);
-				startActivity(new Intent(HachathonFinalImageActivity.this,HachathonMainActivity.class));
+				startActivity(new Intent(HachathonFinalImageActivity.this,HachathonMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
 			}
 		});
 
 		buttonBottomSave.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
+				Bitmap final_bitmap = FileUtil.loadBitmapFromFile("final_tmp");
+				FileUtil.memoryOneImage(final_bitmap, "final");
 				startActivity(new Intent(HachathonFinalImageActivity.this,
 						HachathonLastActivity.class));
 			}
 		});
 
 		buttonBottomCancel.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				setStatus("fit");
@@ -248,10 +210,35 @@ public class HachathonFinalImageActivity extends Activity {
 			buttonRightNo.setVisibility(View.VISIBLE);
 			buttonBottomSave.setVisibility(View.INVISIBLE);
 			buttonBottomCancel.setVisibility(View.INVISIBLE);
-			Bitmap whole = FileUtil.loadBitmapFromFile("whole");
-			Bitmap right = FileUtil.loadBitmapFromFile("right");
-			myImageFinalRight.setImageBitmap(right);
-			myImageFinalDown.setImageBitmap(whole);
+//			Bitmap whole = FileUtil.loadBitmapFromFile("whole");
+//			Bitmap right = FileUtil.loadBitmapFromFile("right");
+//			myImageFinalRight.setImageBitmap(right);
+//			myImageFinalDown.setImageBitmap(whole);
+			
+			//set control size
+			LinearLayout.LayoutParams paramLeft = (LinearLayout.LayoutParams) myImageLayoutLeft
+					.getLayoutParams();
+			paramLeft.width = finalImageWindow.curFrameX - finalImageWindow.viewX;
+			myImageLayoutLeft.setLayoutParams(paramLeft);
+			LinearLayout.LayoutParams paramRight = (LinearLayout.LayoutParams) myImageFinalRight
+					.getLayoutParams();
+			int right_width =  finalImageWindow.viewWidth + finalImageWindow.viewX
+					- finalImageWindow.curFrameX;
+			//int right_height = finalImageWindow.viewHeight;
+			paramRight.width = right_width;
+			myImageFinalRight.setLayoutParams(paramRight);
+			
+			//calculate image size to fit the right imageview
+			Bitmap whole_image = FileUtil.loadBitmapFromFile("whole");
+			Bitmap right_image = FileUtil.loadBitmapFromFile("right");
+//			float width_scale = (float)right_width /(float)tmp_image.getWidth();
+//			float height_scale = (float)right_height / (float)tmp_image.getHeight() ;
+//			Matrix tmp_matrix = new Matrix();
+//			tmp_matrix.postScale(width_scale, height_scale);
+//			Bitmap right_image = Bitmap.createBitmap(tmp_image, 0, 0, tmp_image.getWidth(), tmp_image.getHeight(), tmp_matrix, true);
+			
+			myImageFinalDown.setImageBitmap(whole_image);
+			myImageFinalRight.setImageBitmap(right_image);
 
 		} 
 		else if ("process".equals(input)) {
@@ -338,14 +325,14 @@ public class HachathonFinalImageActivity extends Activity {
 
 		Bitmap tmp_left = FileUtil.loadBitmapFromFile("whole");
 		myImageFinalRight.setDrawingCacheEnabled(true);
-		Bitmap right = FileUtil.loadBitmapFromFile("right");
-		Bitmap tmp_right = Bitmap.createBitmap(right, 0, 0, right.getWidth(), right.getHeight(), m, true); 
-		//Bitmap tmp_right = myImageFinalRight.getDrawingCache();
+		//Bitmap right = FileUtil.loadBitmapFromFile("right");
+		//Bitmap tmp_right = Bitmap.createBitmap(right, 0, 0, right.getWidth(), right.getHeight(), m, true); 
+		Bitmap tmp_right = myImageFinalRight.getDrawingCache();
 
 		// calculate left image size
 		int x_left = 0;
 		int y_left = (image_dy < 0) ? 0 : image_dy;
-		int morePix = (int)(tmp_left.getWidth() * moreScale);
+		int morePix = (int)(finalImageWindow.viewWidth * moreScale);
 		int width_left = finalImageWindow.curFrameX - finalImageWindow.viewX
 				+ ((image_dx>0)?image_dx:0) + morePix;
 		if (width_left > finalImageWindow.viewWidth)
@@ -353,10 +340,10 @@ public class HachathonFinalImageActivity extends Activity {
 		// calculate right image size
 		int x_right = (image_dx > 0) ? image_dx : 0;
 		int y_right = (image_dy > 0) ? image_dy : 0;
-		int width_right = (image_dx > 0) ? image_width : image_width + image_dx;
+		int width_right = (image_dx > 0) ? image_width : (image_width + image_dx);
 		if (image_width + image_dx > tmp_right.getWidth())
 			width_right = tmp_right.getWidth() - image_dx;
-		int height_right = (image_dy > 0) ? image_height : image_height + image_dy;
+		int height_right = (image_dy > 0) ? image_height :( image_height + image_dy);
 		if (height_right + image_dy > tmp_right.getHeight())
 			height_right = tmp_right.getHeight() - image_dy;
 		int height_left = height_right;
@@ -397,12 +384,16 @@ public class HachathonFinalImageActivity extends Activity {
 	{
 		Bitmap final_left = FileUtil.loadBitmapFromFile("final_left");
 		Bitmap final_right = FileUtil.loadBitmapFromFile("final_right");
-		
-		Bitmap result = Bitmap.createBitmap(final_left.getWidth() + final_right.getWidth(), final_left.getHeight(),
+		int morePix = (int)(finalImageWindow.viewWidth * moreScale);
+		int tmp_width = final_left.getWidth() - morePix;
+		Bitmap result = Bitmap.createBitmap(tmp_width + final_right.getWidth(), final_left.getHeight(),
 				Config.RGB_565);
+		//Bitmap result = Bitmap.createBitmap(final_left.getWidth() + final_right.getWidth() , final_right.getHeight(), Config.RGB_565);
+		
+		Bitmap tmp_left = Bitmap.createBitmap(final_left, 0, 0, tmp_width, final_left.getHeight());
 		Canvas canvas = new Canvas(result);
-		canvas.drawBitmap(final_left, new Matrix(), null);
-		canvas.drawBitmap(final_right, final_left.getWidth(), 0, null);
+		canvas.drawBitmap(tmp_left, new Matrix(), null);
+		canvas.drawBitmap(final_right, tmp_left.getWidth(), 0, null);
 		FileUtil.memoryOneImage(result, "final_tmp");
 		
 		//myImageFinalDown.setImageBitmap(result);

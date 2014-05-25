@@ -24,7 +24,7 @@ public class GeometryUtil {
     }
     
     public static Size getOptimalSize(List<Size> sizes, int veiw_width, int view_height) {
-        double targetRatio = (double) view_height / view_height;
+        double targetRatio = (double) veiw_width / view_height;
         double tolerance_first = 0.06, tolerance_max = 0.2, tolerance_dt = 0.02;
         if (sizes == null) return null;
 

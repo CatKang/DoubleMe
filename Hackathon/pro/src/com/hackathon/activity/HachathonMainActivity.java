@@ -51,6 +51,7 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView rightImage;
 	private ImageView floatImage;
 	private ImageView xiangjiImage;
+	private ImageView moveImage;
 	private Button noButton;
 	private Button rightYesButton;
 	private Button rightNoButton;
@@ -84,7 +85,7 @@ public class HachathonMainActivity extends Activity implements
 		takephotoButton.setY((screenHeight - 50) / 2 - 50);
 
 		takephotoButton.setOnClickListener(new OnClickListener() {
-			@Override
+	
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (flag == 0) {
@@ -95,6 +96,8 @@ public class HachathonMainActivity extends Activity implements
 					noButton.setVisibility(View.INVISIBLE);
 					floatImage.setVisibility(View.VISIBLE);
 					rightImage.setVisibility(View.INVISIBLE);
+					xiangjiImage.setVisibility(View.GONE);
+					moveImage.setVisibility(View.GONE);
 					leftImage.setVisibility(View.VISIBLE);
 					//floatImage.setBackgroundColor(Color.TRANSPARENT);
 					camera.startPreview();
@@ -145,16 +148,17 @@ public class HachathonMainActivity extends Activity implements
 		rightNoButton = (Button)findViewById(R.id.rightNoButton);
 		
 		xiangjiImage = (ImageView)findViewById(R.id.imageXiangji);
+		moveImage = (ImageView)findViewById(R.id.imageMove);
 	}
 
-	@Override
+
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		// TODO 自动生成方法存根
 
 	}
 
-	@Override
+
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 自动生成方法存根
 		camera = Camera.open();
@@ -191,7 +195,7 @@ public class HachathonMainActivity extends Activity implements
 
 	}
 
-	@Override
+
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// TODO 自动生成方法存根
 
@@ -231,8 +235,10 @@ public class HachathonMainActivity extends Activity implements
 
 				leftImage.setVisibility(View.VISIBLE);
 				leftImage.setImageBitmap(targetbm_left);
-				xiangjiImage.setVisibility(View.VISIBLE);
-				rightImage.setBackgroundColor(Color.GRAY);
+//				xiangjiImage.setVisibility(View.VISIBLE);
+				moveImage.setVisibility(View.GONE);
+				rightImage.setBackgroundColor(Color.BLACK);
+				rightImage.getBackground().setAlpha(200);
 				rightImage.setVisibility(View.VISIBLE);
 				noButton.setVisibility(View.VISIBLE);
 				floatImage.setVisibility(View.INVISIBLE);
@@ -240,13 +246,14 @@ public class HachathonMainActivity extends Activity implements
 				floatImage.setAlpha(99);
 				noButton.setOnClickListener(new OnClickListener() {
 
-					@Override
+
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
 						leftImage.setVisibility(View.GONE);
 						noButton.setVisibility(View.GONE);
 						rightImage.setVisibility(View.VISIBLE);
-						rightImage.setBackgroundResource(R.drawable.shadow);
+						rightImage.setBackgroundResource(R.drawable.shadow_right);
+						moveImage.setVisibility(View.VISIBLE);
 						floatImage.setVisibility(View.INVISIBLE);
 						xiangjiImage.setVisibility(View.GONE);
 						flag = 0;
@@ -264,6 +271,7 @@ public class HachathonMainActivity extends Activity implements
 				finalImageIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 				finalImageIntent.putExtra("HkWindow", curWindow);
 				startActivity(finalImageIntent);
+				camera.release();
 			}
 
 		}

@@ -98,7 +98,7 @@ public class FileUtil {
 		}
 	}
 
-	public static void memory(String path, Bitmap bitmap) {
+	private static void memory(String path, Bitmap bitmap) {
 
 		File myCaptureFile = new File(path);
 		BufferedOutputStream bos = null;
