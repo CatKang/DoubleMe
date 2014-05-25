@@ -493,9 +493,9 @@ public class HachathonFinalImageActivity extends Activity {
 		
 		String fileName1 = FileUtil.getFilePathByType("final_left");
 		 String fileName2 = FileUtil.getFilePathByType("final_right");
-		 //int ret = SiftFun.siftConjunction(fileName1, fileName2);
+		 int ret = SiftFun.siftConjunction(fileName1, fileName2);
 		 //Toast.makeText(getApplicationContext(), "conjunction finished : " + ret, 100).show();
-		 //if (ret != 0)
+		 if (ret != 0)
 			 generateFinalImage_directly();
 //		 else
 //		 {
