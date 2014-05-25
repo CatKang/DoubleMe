@@ -52,6 +52,12 @@ public class HachathonFinalImageActivity extends Activity {
 	private FrameLayout myLayoutLeft;
 	private FrameLayout mBottomPhotoFrameLayout;
 	
+	private View frameTop;
+	private View frameBottom;
+	private View frameLeft;
+	private View frameRight;
+	
+	
 	private FinalImageWindow finalImageWindow;
 	public ImageSize cropBox;
 	
@@ -94,7 +100,10 @@ public class HachathonFinalImageActivity extends Activity {
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 		myLayoutLeft = (FrameLayout) findViewById(R.id.myImageLayoutLeft);
 		mBottomPhotoFrameLayout = (FrameLayout) findViewById(R.id.mBottomPhotoFrameLayout);
-
+		frameTop = (View)findViewById(R.id.frameTop);
+		frameBottom = (View)findViewById(R.id.frameBottom);
+		frameLeft = (View)findViewById(R.id.frameLeft);
+		frameRight = (View)findViewById(R.id.frameRight);
 
 		setStatus("fit");
 		
@@ -102,6 +111,7 @@ public class HachathonFinalImageActivity extends Activity {
 		myImageFinalRight.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				refreshCropBox();
 				switch (event.getAction() & MotionEvent.ACTION_MASK) {
 				case MotionEvent.ACTION_DOWN:
 					savedMatrix.set(matrix);
@@ -118,7 +128,7 @@ public class HachathonFinalImageActivity extends Activity {
 					break;
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_POINTER_UP:
-					refreshCropBox();
+					
 					mode = NONE;
 					break;
 				case MotionEvent.ACTION_MOVE:
@@ -201,6 +211,11 @@ public class HachathonFinalImageActivity extends Activity {
 				setStatus("fit");
 			}
 		});
+		
+		
+		
+		
+		
 
 	}
 
@@ -300,7 +315,18 @@ public class HachathonFinalImageActivity extends Activity {
 	private void paintCropBox()
 	{
 		Toast.makeText(getApplicationContext(), cropBox.x + "," + cropBox.y + ", "+ cropBox.width + ", "+ cropBox.height , 500).show();
-		
+		frameTop.setX(cropBox.x);
+		frameTop.setY(cropBox.y);	
+		frameBottom.setX(cropBox.x);
+		frameBottom.setY(cropBox.y+cropBox.height);
+		frameLeft.setX(cropBox.x);
+		frameLeft.setY(cropBox.y);
+		frameRight.setX(cropBox.x+cropBox.width);
+		frameRight.setY(cropBox.y);
+		frameTop.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, 5));
+		frameBottom.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, 5));
+		frameLeft.setLayoutParams(new LinearLayout.LayoutParams(5,cropBox.height));
+		frameRight.setLayoutParams(new LinearLayout.LayoutParams(5,cropBox.height));
 	}
 	
 	class ProcessThread extends Thread {

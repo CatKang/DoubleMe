@@ -6,8 +6,7 @@
     android:orientation="horizontal"
     android:id="@+id/outsideLayout" >
 
-    
- 
+   
   <FrameLayout
         android:id="@+id/mBottomPhotoFrameLayout"
         android:layout_width="fill_parent"
@@ -88,7 +87,27 @@
 	           android:background="@drawable/cancel"
 	           android:layout_marginBottom="50dp" />
           
+         
     </FrameLayout>
-
+    <View 
+             android:id="@+id/frameTop"
+             android:layout_width="1280dp"
+             android:layout_height="5dp"
+             android:background="@android:color/white"/>
+         <View 
+             android:id="@+id/frameBottom"
+             android:layout_width="1280dp"
+             android:layout_height="5dp"
+             android:background="@android:color/white"/>
+         <View 
+             android:id="@+id/frameLeft"
+             android:layout_width="5dp"
+             android:layout_height="720dp"
+             android:background="@android:color/white"/>
+         <View 
+             android:id="@+id/frameRight"
+             android:layout_width="5dp"
+             android:layout_height="720dp"
+             android:background="@android:color/white"/>
    
 </LinearLayout>
