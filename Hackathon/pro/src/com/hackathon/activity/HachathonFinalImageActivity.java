@@ -61,8 +61,8 @@ public class HachathonFinalImageActivity extends Activity {
 	private FinalImageWindow finalImageWindow;
 	public ImageSize cropBox;
 	
-	private float moreScale = (float) 0.08;    //左边图片多给的比例
-	private float remainScale = (float) 0.20;  //右侧边栏的比例
+	private float moreScale = (float) 0.12;    //左边图片多给的比例
+	private float remainScale = (float) 0.10;  //右侧边栏的比例
 	private int margin = 60;
 	
 	/* ImageViewRight onTouch */
@@ -107,7 +107,7 @@ public class HachathonFinalImageActivity extends Activity {
 
 		setStatus("fit");
 		
-		
+		paintCropBox();
 		myImageFinalRight.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -228,6 +228,10 @@ public class HachathonFinalImageActivity extends Activity {
 			buttonRightNo.setVisibility(View.VISIBLE);
 			buttonBottomSave.setVisibility(View.INVISIBLE);
 			buttonBottomCancel.setVisibility(View.INVISIBLE);
+			frameTop.setVisibility(View.VISIBLE);
+			frameBottom.setVisibility(View.VISIBLE);
+			frameLeft.setVisibility(View.VISIBLE);
+			frameRight.setVisibility(View.VISIBLE);
 			paintFinalImageView();
 
 		} 
@@ -235,6 +239,10 @@ public class HachathonFinalImageActivity extends Activity {
 			progressBar.setVisibility(View.VISIBLE);
 			buttonRightYes.setVisibility(View.INVISIBLE);
 			buttonRightNo.setVisibility(View.INVISIBLE);
+			frameTop.setVisibility(View.INVISIBLE);
+			frameBottom.setVisibility(View.INVISIBLE);
+			frameLeft.setVisibility(View.INVISIBLE);
+			frameRight.setVisibility(View.INVISIBLE);
 
 		}else if ("save".equals(input)) {
 			progressBar.setVisibility(View.INVISIBLE);
@@ -308,7 +316,7 @@ public class HachathonFinalImageActivity extends Activity {
 		ImageSize size_right = sizes.get(1);
 		myImageFinalRight.setDrawingCacheEnabled(false);
 		int morePix = (int)(finalImageWindow.viewWidth * moreScale);
-		cropBox.change(size_left.x, size_left.y, size_left.width - morePix + size_right.width, size_right.height);
+		cropBox.change(finalImageWindow.viewX + size_left.x, finalImageWindow.viewY + size_left.y, size_left.width - morePix + size_right.width, size_right.height);
 		paintCropBox();
 	}
 	
@@ -318,10 +326,10 @@ public class HachathonFinalImageActivity extends Activity {
 		frameTop.setX(cropBox.x);
 		frameTop.setY(cropBox.y);	
 		frameBottom.setX(cropBox.x);
-		frameBottom.setY(cropBox.y+cropBox.height);
+		frameBottom.setY(cropBox.y + cropBox.height);
 		frameLeft.setX(cropBox.x);
 		frameLeft.setY(cropBox.y);
-		frameRight.setX(cropBox.x+cropBox.width);
+		frameRight.setX(cropBox.x + cropBox.width);
 		frameRight.setY(cropBox.y);
 		frameTop.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, 5));
 		frameBottom.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, 5));
@@ -433,16 +441,27 @@ public class HachathonFinalImageActivity extends Activity {
 			width_left = finalImageWindow.viewWidth;
 		
 		// calculate right image size
+		int y_right, height_right;
 		int x_right = (image_dx > 0) ? image_dx : 0;
-		int y_right = (image_dy > 0) ? image_dy : 0;
 		int width_right = (image_dx > 0) ? image_width
 				: (image_width + image_dx);
-		if (image_width + image_dx > rwidth)
-			width_right = rwidth - image_dx;
-		int height_right = (image_dy > 0) ? image_height
-				: (image_height + image_dy);
-		if (height_right + image_dy > rheight)
-			height_right = rheight - image_dy;
+		if(width_right + width_left > finalImageWindow.viewWidth)
+			width_right = finalImageWindow.viewWidth - (width_left - morePix);
+		if (image_dy >0)
+		{
+			y_right = image_dy;
+			if (y_right + image_height > finalImageWindow.viewHeight)
+				height_right = finalImageWindow.viewHeight - y_right; 
+			else
+				height_right = image_height;
+		}else
+		{
+			y_right = 0;
+			height_right = image_height + image_dy;
+			if (height_right >  finalImageWindow.viewHeight)
+				height_right = finalImageWindow.viewHeight;
+			
+		}
 		int height_left = height_right;
 
 		ImageSize size_left = new ImageSize(x_left, y_left, width_left, height_left);

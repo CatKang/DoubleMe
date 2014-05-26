@@ -153,6 +153,7 @@ public class HachathonMainActivity extends Activity implements
 			int height) {
 		// TODO 自动生成方法存根
 
+		
 	}
 
 
@@ -195,7 +196,7 @@ public class HachathonMainActivity extends Activity implements
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// TODO 自动生成方法存根
-
+		camera.release();
 	}
 
 	private ShutterCallback shutterCallback = new ShutterCallback() {
