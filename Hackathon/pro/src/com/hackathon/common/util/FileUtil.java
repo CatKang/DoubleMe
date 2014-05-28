@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -16,7 +17,8 @@ public class FileUtil {
 	private static String root_dir = Environment.getExternalStorageDirectory()
 			+ "/high_camera";
 	private static String schedul_path = "schedul.txt";
-
+	private static String evn_log_path = "/env.txt";
+	
 	public static String getFilePathByType(String type) {
 		String path = root_dir;
 		if ("right".equals(type))
@@ -38,7 +40,11 @@ public class FileUtil {
 		else if ("final_right_tmp".equals(type))
 			path += "/camera_final_right_tmp.jpg";
 		else if ("final".equals(type))
-			path += "/final_"+ System.currentTimeMillis()+".jpg";
+			path += "/"+ System.currentTimeMillis()+"final.jpg";
+		else if ("final_record_left".equals(type))
+			path += "/"+ System.currentTimeMillis()+"final_left.jpg";
+		else if ("final_record_right".equals(type))
+			path += "/"+ System.currentTimeMillis()+"final_right.jpg";
 		else
 			return null;
 		return path;
@@ -49,6 +55,9 @@ public class FileUtil {
 		File dir = new File(root_dir);
 		if (!dir.exists())
 			dir.mkdir();
+		File env_log = new File(root_dir + evn_log_path);
+		if(env_log.exists())
+			env_log.delete();
 	}
 
 	public static Bitmap loadBitmapFromFile(String type) {
@@ -120,6 +129,25 @@ public class FileUtil {
 		//TODO read from file
 		
 		
+	}
+	
+	public static void recordEnv(String content)
+	{
+		try {
+			File saveFile = new File(root_dir, evn_log_path);
+			FileOutputStream outStream = new FileOutputStream(saveFile,true);
+			outStream.write((content+"\r\n").getBytes());
+			outStream.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally
+		{
+			
+		}
 	}
 	
 //	public static void memoryImages() {

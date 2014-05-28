@@ -172,8 +172,13 @@ public class HachathonMainActivity extends Activity implements
 			List<Camera.Size> s_pictureSize = parameters
 					.getSupportedPictureSizes();
 			pictureSize = GeometryUtil.getOptimalSize(
+			
 					s_pictureSize, screenWidth, screenHeight);
-
+			
+			//record env.log
+			FileUtil.recordEnv("PreviewSize: ("+ previewSize.width + " , " + previewSize.height +")");
+			FileUtil.recordEnv("PictureSize: ("+ pictureSize.width + " , " + pictureSize.height +")");
+			FileUtil.recordEnv("WindowSize: ("+ screenWidth + " , " + screenHeight +")");
 			parameters.setPreviewSize(previewSize.width, previewSize.height);
 			try {
 				parameters.setPictureSize(pictureSize.width, pictureSize.height);

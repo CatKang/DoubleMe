@@ -40,8 +40,11 @@ public class GeometryUtil {
 
 		int targetHeight = view_height;
 		// find an size match both ratio and size among a given tolerance range
+		boolean record = false;
 		for (double tolerance_cur = tolerance_first; tolerance_cur <= tolerance_max; tolerance_cur += tolerance_dt) {
 			for (Size size : sizes) {
+				if (record == false)
+					FileUtil.recordEnv("support size : ("+ size.width + " , " + size.height +")");
 				double ratio = (double) size.width / size.height;
 				if (Math.abs(ratio - targetRatio) > tolerance_cur)
 					continue;
@@ -50,6 +53,8 @@ public class GeometryUtil {
 					minDiff = Math.abs(size.height - targetHeight);
 				}
 			}
+			FileUtil.recordEnv("");
+			record = true;
 		}
 
 		// failed to find that kind of size, ignore the radio

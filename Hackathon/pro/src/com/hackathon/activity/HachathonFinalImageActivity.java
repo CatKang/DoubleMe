@@ -12,6 +12,7 @@ import com.hackathon.entity.CropFrame;
 import com.hackathon.entity.FinalImageWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
+import com.hackathon.view.CropBoxView;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -51,12 +52,8 @@ public class HachathonFinalImageActivity extends Activity {
 	private ProgressBar progressBar;
 	private FrameLayout myLayoutLeft;
 	private FrameLayout mBottomPhotoFrameLayout;
-	
-	private View frameTop;
-	private View frameBottom;
-	private View frameLeft;
-	private View frameRight;
-	
+
+	private CropBoxView cropBoxView;
 	
 	private FinalImageWindow finalImageWindow;
 	public ImageSize cropBox;
@@ -100,14 +97,13 @@ public class HachathonFinalImageActivity extends Activity {
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 		myLayoutLeft = (FrameLayout) findViewById(R.id.myImageLayoutLeft);
 		mBottomPhotoFrameLayout = (FrameLayout) findViewById(R.id.mBottomPhotoFrameLayout);
-		frameTop = (View)findViewById(R.id.frameTop);
-		frameBottom = (View)findViewById(R.id.frameBottom);
-		frameLeft = (View)findViewById(R.id.frameLeft);
-		frameRight = (View)findViewById(R.id.frameRight);
-
+		cropBoxView = (CropBoxView)findViewById(R.id.cropBoxView);
+		cropBoxView.setColour(Color.WHITE);  
+		cropBoxView.setBorderWidth(10);  
+		
 		setStatus("fit");
 		
-		paintCropBox();
+		//paintCropBox();
 		myImageFinalRight.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -152,7 +148,6 @@ public class HachathonFinalImageActivity extends Activity {
 		});
 
 		buttonRightYes.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				//切换状态
@@ -200,6 +195,13 @@ public class HachathonFinalImageActivity extends Activity {
 			public void onClick(View v) {
 				Bitmap final_bitmap = FileUtil.loadBitmapFromFile("final_tmp");
 				FileUtil.memoryOneImage(final_bitmap, "final");
+				
+				Bitmap final_left = FileUtil.loadBitmapFromFile("final_left");
+				FileUtil.memoryOneImage(final_left, "final_record_left");
+				Bitmap final_right = FileUtil.loadBitmapFromFile("final_right");
+				FileUtil.memoryOneImage(final_right, "final_record_right");
+				
+				
 				startActivity(new Intent(HachathonFinalImageActivity.this,
 						HachathonLastActivity.class));
 			}
@@ -211,14 +213,14 @@ public class HachathonFinalImageActivity extends Activity {
 				setStatus("fit");
 			}
 		});
-		
-		
-		
-		
-		
-
 	}
 
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		paintCropBox();
+	     super.onWindowFocusChanged(hasFocus);
+	    }
+	
 	private void setStatus(String input) {
 		if ("fit".equals(input)) {
 			myImageFinalRight.setVisibility(View.VISIBLE);
@@ -228,21 +230,15 @@ public class HachathonFinalImageActivity extends Activity {
 			buttonRightNo.setVisibility(View.VISIBLE);
 			buttonBottomSave.setVisibility(View.INVISIBLE);
 			buttonBottomCancel.setVisibility(View.INVISIBLE);
-			frameTop.setVisibility(View.VISIBLE);
-			frameBottom.setVisibility(View.VISIBLE);
-			frameLeft.setVisibility(View.VISIBLE);
-			frameRight.setVisibility(View.VISIBLE);
+			cropBoxView.setVisibility(View.VISIBLE);
 			paintFinalImageView();
 
 		} 
 		else if ("process".equals(input)) {
 			progressBar.setVisibility(View.VISIBLE);
-			buttonRightYes.setVisibility(View.INVISIBLE);
-			buttonRightNo.setVisibility(View.INVISIBLE);
-			frameTop.setVisibility(View.INVISIBLE);
-			frameBottom.setVisibility(View.INVISIBLE);
-			frameLeft.setVisibility(View.INVISIBLE);
-			frameRight.setVisibility(View.INVISIBLE);
+			buttonRightYes.setVisibility(View.GONE);
+			buttonRightNo.setVisibility(View.GONE);
+			cropBoxView.setVisibility(View.GONE);
 
 		}else if ("save".equals(input)) {
 			progressBar.setVisibility(View.INVISIBLE);
@@ -323,18 +319,22 @@ public class HachathonFinalImageActivity extends Activity {
 	private void paintCropBox()
 	{
 		Toast.makeText(getApplicationContext(), cropBox.x + "," + cropBox.y + ", "+ cropBox.width + ", "+ cropBox.height , 500).show();
-		frameTop.setX(cropBox.x);
-		frameTop.setY(cropBox.y);	
-		frameBottom.setX(cropBox.x);
-		frameBottom.setY(cropBox.y + cropBox.height);
-		frameLeft.setX(cropBox.x);
-		frameLeft.setY(cropBox.y);
-		frameRight.setX(cropBox.x + cropBox.width);
-		frameRight.setY(cropBox.y);
-		frameTop.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, 5));
-		frameBottom.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, 5));
-		frameLeft.setLayoutParams(new LinearLayout.LayoutParams(5,cropBox.height));
-		frameRight.setLayoutParams(new LinearLayout.LayoutParams(5,cropBox.height));
+		cropBoxView.setX(cropBox.x);
+		cropBoxView.setY(cropBox.y);
+		cropBoxView.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, cropBox.height) );
+		
+//		frameTop.setX(cropBox.x);
+//		frameTop.setY(cropBox.y);	
+//		frameBottom.setX(cropBox.x);
+//		frameBottom.setY(cropBox.y + cropBox.height);
+//		frameLeft.setX(cropBox.x);
+//		frameLeft.setY(cropBox.y);
+//		frameRight.setX(cropBox.x + cropBox.width);
+//		frameRight.setY(cropBox.y);
+//		frameTop.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, 5));
+//		frameBottom.setLayoutParams(new LinearLayout.LayoutParams(cropBox.width, 5));
+//		frameLeft.setLayoutParams(new LinearLayout.LayoutParams(5,cropBox.height));
+		//frameRight.setLayoutParams(new LinearLayout.LayoutParams(5,cropBox.height));
 	}
 	
 	class ProcessThread extends Thread {
