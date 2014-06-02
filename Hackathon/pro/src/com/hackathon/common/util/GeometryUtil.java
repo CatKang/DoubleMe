@@ -28,48 +28,69 @@ public class GeometryUtil {
 		point.set(x / 2, y / 2);
 	}
 
-	public static Size getOptimalSize(List<Size> sizes, int veiw_width,
-			int view_height) {
-		double targetRatio = (double) veiw_width / view_height;
-		double tolerance_first = 0.06, tolerance_max = 0.2, tolerance_dt = 0.02;
-		if (sizes == null)
-			return null;
+//	public static Size getOptimalSize(List<Size> sizes, int veiw_width,
+//			int view_height) {
+//		double targetRatio = (double) veiw_width / view_height;
+//		double tolerance_first = 0, tolerance_max = 0.5, tolerance_dt = 0.1;
+//		if (sizes == null)
+//			return null;
+//
+//		Size optimalSize = null;
+//		double minDiff = Double.MAX_VALUE;
+//
+//		int targetHeight = view_height;
+//		// find an size match both ratio and size among a given tolerance range
+//		boolean record = false;
+//		for (double tolerance_cur = tolerance_first; tolerance_cur <= tolerance_max; tolerance_cur += tolerance_dt) {
+//			for (Size size : sizes) {
+//				
+//				double ratio = (double) size.width / (double)size.height;
+//				if (record == false)
+//					FileUtil.recordEnv("support size : ("+ size.width + " , " + size.height +")  radio :" + ratio );
+//				if (Math.abs(ratio - targetRatio) > tolerance_cur)
+//					continue;
+//				if (Math.abs(size.height - targetHeight) < minDiff) {
+//					optimalSize = size;
+//					minDiff = Math.abs(size.height - targetHeight);
+//				}
+//			}
+//			FileUtil.recordEnv("");
+//			record = true;
+//		}
+//
+//		// failed to find that kind of size, ignore the radio
+//		if (optimalSize == null) {
+//			Log.i(TAG, "Ignore radio when try to find optimal size");
+//			minDiff = Double.MAX_VALUE;
+//			for (Size size : sizes) {
+//				if (Math.abs(size.height - targetHeight) < minDiff) {
+//					optimalSize = size;
+//					minDiff = Math.abs(size.height - targetHeight);
+//				}
+//			}
+//		}
+//		return optimalSize;
+//	}
 
-		Size optimalSize = null;
-		double minDiff = Double.MAX_VALUE;
-
-		int targetHeight = view_height;
-		// find an size match both ratio and size among a given tolerance range
-		boolean record = false;
-		for (double tolerance_cur = tolerance_first; tolerance_cur <= tolerance_max; tolerance_cur += tolerance_dt) {
-			for (Size size : sizes) {
-				if (record == false)
-					FileUtil.recordEnv("support size : ("+ size.width + " , " + size.height +")");
-				double ratio = (double) size.width / size.height;
-				if (Math.abs(ratio - targetRatio) > tolerance_cur)
-					continue;
-				if (Math.abs(size.height - targetHeight) < minDiff) {
-					optimalSize = size;
-					minDiff = Math.abs(size.height - targetHeight);
-				}
-			}
-			FileUtil.recordEnv("");
-			record = true;
+	/**
+	 * 等比例所犯preSize 使其大小限制在window_width 和  window_height 之中
+	 * @param preSize
+	 * @param window_width
+	 * @param window_height
+	 */
+	public static void uniformScale(Size preSize, int window_width, int window_height)
+	{
+		float previewRadio = (float)preSize.width / (float)preSize.height;
+		float windowRadio = (float)window_width / (float)window_height;
+		if (previewRadio > windowRadio)
+		{
+			preSize.width = window_width;
+			preSize.height = (int) (preSize.width / previewRadio);
 		}
-
-		// failed to find that kind of size, ignore the radio
-		if (optimalSize == null) {
-			Log.i(TAG, "Ignore radio when try to find optimal size");
-			minDiff = Double.MAX_VALUE;
-			for (Size size : sizes) {
-				if (Math.abs(size.height - targetHeight) < minDiff) {
-					optimalSize = size;
-					minDiff = Math.abs(size.height - targetHeight);
-				}
-			}
+		else
+		{
+			preSize.height = window_height;
+			preSize.width = (int)(preSize.height * previewRadio);
 		}
-		return optimalSize;
 	}
-
-	
 }

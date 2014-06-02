@@ -219,7 +219,7 @@ public class HachathonFinalImageActivity extends Activity {
 	public void onWindowFocusChanged(boolean hasFocus) {
 		paintCropBox();
 	     super.onWindowFocusChanged(hasFocus);
-	    }
+	}
 	
 	private void setStatus(String input) {
 		if ("fit".equals(input)) {
@@ -301,8 +301,6 @@ public class HachathonFinalImageActivity extends Activity {
 		paintCropBox();
 	}
 	
-
-	
 	private void refreshCropBox()
 	{	
 		myImageFinalRight.setDrawingCacheEnabled(true);
@@ -353,12 +351,10 @@ public class HachathonFinalImageActivity extends Activity {
 			msg.what = -1;
 			handler.sendMessage(msg);
 		}
-		
 	}
 
 	
 	private Handler handler = new Handler() {
-
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);

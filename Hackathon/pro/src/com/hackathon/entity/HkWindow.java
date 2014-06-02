@@ -21,13 +21,16 @@ public class HkWindow implements Serializable{
 	public int curFrameYMax;
 	public int curFrameXMin; // 边框所允许移动的左右界
 	public int curFrameXMax;
-	public int onFrameThreshold = 50; // 认为在边框上的阈值
-
-	public HkWindow(SurfaceView sview) {
+	
+	public double onFrameThresholdRadio = 0.03; // 认为在边框上的阈值
+	public double insideThresholdRadio = 0.3; // 认为在边框上的阈值
+	public int onFrameThreshold; // 认为在边框上的阈值
+	public int insideThreshold; // 认为在边框上的阈值
+	public HkWindow(SurfaceView sview, int view_width, int view_height) {
 //		viewHeight = sview.getwgetMeasuredHeight();
 //		viewWidth = sview.getMeasuredWidth();
-		viewHeight = sview.getHeight();
-		viewWidth = sview.getWidth();
+		viewHeight = view_height;
+		viewWidth = view_width;
 		int[] location = new int[2];
 		sview.getLocationOnScreen(location);	
 		viewX = location[0];
@@ -36,11 +39,13 @@ public class HkWindow implements Serializable{
 	}
 
 	private void initialWindow() {
+		onFrameThreshold = (int)(viewWidth * onFrameThresholdRadio);
+		insideThreshold = (int)(viewWidth * insideThresholdRadio);
 		curFrameX = viewX + viewWidth / 2;
 		curFrameYMin = viewY;
 		curFrameYMax = viewY + viewHeight;
-		curFrameXMin = viewX + 100;
-		curFrameXMax = viewX + (viewWidth - 100);
+		curFrameXMin = viewX + insideThreshold;
+		curFrameXMax = viewX + (viewWidth - insideThreshold);
 	}
 
 	public boolean onFrame(int curX, int curY) {
