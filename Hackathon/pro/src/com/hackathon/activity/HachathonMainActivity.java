@@ -161,57 +161,7 @@ public class HachathonMainActivity extends Activity implements
 	}
 
 	
-	/**	
-	 * set the Optimal previewSize and pictureSize
-	 * 1，找跟屏幕比例最接近的preview size
-	 * 2，找与选中的preview size 一致的 picture size
-	 * 3，在符合条件的picture size 中找与target_pic_height 最接近的尺寸
-	 * 3，设置previewSize pictureSize
-	 * @param s_previewSize 所有支持的preview size
-	 * @param s_pictureSize 所有支持的picture size
-	 * @param target_pic_height 目标图片比例
-	 * @return 找到合适的返回true。 否则false
-	 */
-	private boolean setPreveiewAndPictureSize(List<Camera.Size> s_previewSize, List<Camera.Size> s_pictureSize, int target_pic_height)
-	{
-		double precision = 0.00001;
-		double windowSize_ratio = (double) windowSize_width / windowSize_height;
-		double tolerance_first = 0, tolerance_max = 0.5, tolerance_dt = 0.1;
-		//1.第一层， 循环可接受的preview 与屏幕的比例差距
-		for (double tolerance_cur = tolerance_first; tolerance_cur <= tolerance_max; tolerance_cur += tolerance_dt) {
-			//2.第二层， 循环所有支持的previewsize
-			for (Size preSize : s_previewSize) {			
-				double preRatio = (double) preSize.width / (double)preSize.height;
-				if (Math.abs(preRatio - windowSize_ratio) - tolerance_cur > precision)
-					continue;
-				//找到最可接受的preview size， 用这个size 尝试去找同比例的picture size
-				int min_diff = target_pic_height;
-				Size cur_best_pic = null;
-				//3.第三层， 循环所有支持的picturesize
-				for (Size picSize : s_pictureSize)
-				{
-					double picRatio = (double) picSize.width / (double)picSize.height;
-					
-					if (Math.abs(picRatio - preRatio) < precision)
-					{
-						//preview size 与 picture size 相等
-						if (Math.abs(preSize.height - target_pic_height) < min_diff)
-						{
-							min_diff = Math.abs(preSize.height - target_pic_height);
-							cur_best_pic = picSize;	
-						}
-					}
-				}
-				if(cur_best_pic != null)
-				{
-					previewSize = preSize;
-					pictureSize = cur_best_pic;
-					return true;
-				}
-			}
-		}
-		return false;
-	}	
+	
 	
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 自动生成方法存根
@@ -232,6 +182,9 @@ public class HachathonMainActivity extends Activity implements
 				Toast.makeText(getBaseContext(), "Fatal Error! Exit!", 100).show();
 				
 			}
+			FileUtil.recordSupportSize(s_previewSize, s_pictureSize);
+			
+			
 //			previewSize = GeometryUtil.getOptimalSize(
 //					s_previewSize, windowSize_width, windowSize_height);
 //			previewSize.width = 960;
@@ -240,8 +193,8 @@ public class HachathonMainActivity extends Activity implements
 			
 //			pictureSize = GeometryUtil.getOptimalSize(
 //					s_pictureSize,  windowSize_width, windowSize_height);
-//			pictureSize.width = 1024;
-//			pictureSize.height = 768;
+//			pictureSize.width = 2048;
+//			pictureSize.height = 1536;
 //			
 			//record env.log
 			FileUtil.recordEnv("PreviewSize: ("+ previewSize.width + " , " + previewSize.height +")");
@@ -393,4 +346,58 @@ public class HachathonMainActivity extends Activity implements
 		}
 		return true;
 	}
+	
+	
+	
+	/**	
+	 * set the Optimal previewSize and pictureSize
+	 * 1，找跟屏幕比例最接近的preview size
+	 * 2，找与选中的preview size 一致的 picture size
+	 * 3，在符合条件的picture size 中找与target_pic_height 最接近的尺寸
+	 * 3，设置previewSize pictureSize
+	 * @param s_previewSize 所有支持的preview size
+	 * @param s_pictureSize 所有支持的picture size
+	 * @param target_pic_height 目标图片比例
+	 * @return 找到合适的返回true。 否则false
+	 */
+	private boolean setPreveiewAndPictureSize(List<Camera.Size> s_previewSize, List<Camera.Size> s_pictureSize, int target_pic_height)
+	{
+		double precision = 0.00001;
+		double windowSize_ratio = (double) windowSize_width / windowSize_height;
+		double tolerance_first = 0, tolerance_max = 0.5, tolerance_dt = 0.1;
+		//1.第一层， 循环可接受的preview 与屏幕的比例差距
+		for (double tolerance_cur = tolerance_first; tolerance_cur <= tolerance_max; tolerance_cur += tolerance_dt) {
+			//2.第二层， 循环所有支持的previewsize
+			for (Size preSize : s_previewSize) {			
+				double preRatio = (double) preSize.width / (double)preSize.height;
+				if (Math.abs(preRatio - windowSize_ratio) - tolerance_cur > precision)
+					continue;
+				//找到最可接受的preview size， 用这个size 尝试去找同比例的picture size
+				int min_diff = target_pic_height;
+				Size cur_best_pic = null;
+				//3.第三层， 循环所有支持的picturesize
+				for (Size picSize : s_pictureSize)
+				{
+					double picRatio = (double) picSize.width / (double)picSize.height;
+					
+					if (Math.abs(picRatio - preRatio) <= precision)
+					{
+						//preview size 与 picture size 相等
+						if (cur_best_pic == null || Math.abs(picSize.height - target_pic_height) < min_diff)
+						{
+							min_diff = Math.abs(picSize.height - target_pic_height);
+							cur_best_pic = picSize;	
+						}
+					}
+				}
+				if(cur_best_pic != null)
+				{
+					previewSize = preSize;
+					pictureSize = cur_best_pic;
+					return true;
+				}
+			}
+		}
+		return false;
+	}	
 }

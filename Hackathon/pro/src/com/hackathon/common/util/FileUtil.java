@@ -5,10 +5,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Camera;
+import android.hardware.Camera.Size;
 import android.os.Environment;
 import android.util.Log;
 
@@ -129,6 +134,19 @@ public class FileUtil {
 		//TODO read from file
 		
 		
+	}
+	
+	public static void recordSupportSize(List<Camera.Size> pre_size, List<Camera.Size> pic_size)
+	{
+		
+		recordEnv("***************preview size*************");
+		for (Size one_size : pre_size) {	
+			recordEnv("PreviewSupportSize: ("+ one_size.width + " , " + one_size.height +") radio : " + ((double)one_size.width/(double)one_size.height));
+		}
+		recordEnv("***************picture size*************");
+		for (Size one_size : pic_size) {	
+			recordEnv("PictureSupportSize: ("+ one_size.width + " , " + one_size.height +") radio : " + ((double)one_size.width/(double)one_size.height));
+		}
 	}
 	
 	public static void recordEnv(String content)
