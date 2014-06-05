@@ -80,17 +80,31 @@ public class GeometryUtil {
 	 */
 	public static void uniformScale(Size preSize, int window_width, int window_height)
 	{
-		float previewRadio = (float)preSize.width / (float)preSize.height;
+		int[] pre = {preSize.width, preSize.height};
+		GeometryUtil.uniformScale(pre, window_width, window_height);
+		preSize.width = pre[0];
+		preSize.height = pre[1];
+	}
+	/**
+	 * 等比例所犯preSize 使其大小限制在window_width 和  window_height 之中
+	 * @param preSize
+	 * @param window_width
+	 * @param window_height
+	 */
+	public static void uniformScale(int[] preSize, int window_width, int window_height)
+	{
+		float previewRadio = (float)preSize[0] / (float)preSize[1];
 		float windowRadio = (float)window_width / (float)window_height;
 		if (previewRadio > windowRadio)
 		{
-			preSize.width = window_width;
-			preSize.height = (int) (preSize.width / previewRadio);
+			preSize[0] = window_width;
+			preSize[1] = (int) (preSize[0] / previewRadio);
 		}
 		else
 		{
-			preSize.height = window_height;
-			preSize.width = (int)(preSize.height * previewRadio);
+			preSize[1] = window_height;
+			preSize[0] = (int)(preSize[1] * previewRadio);
 		}
 	}
+	
 }

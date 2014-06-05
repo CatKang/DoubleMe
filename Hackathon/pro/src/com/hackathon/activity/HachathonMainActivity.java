@@ -195,7 +195,7 @@ public class HachathonMainActivity extends Activity implements
 //					s_pictureSize,  windowSize_width, windowSize_height);
 //			pictureSize.width = 2048;
 //			pictureSize.height = 1536;
-//			
+			
 			//record env.log
 			FileUtil.recordEnv("PreviewSize: ("+ previewSize.width + " , " + previewSize.height +")");
 			FileUtil.recordEnv("PictureSize: ("+ pictureSize.width + " , " + pictureSize.height +")");
@@ -365,6 +365,7 @@ public class HachathonMainActivity extends Activity implements
 		double precision = 0.00001;
 		double windowSize_ratio = (double) windowSize_width / windowSize_height;
 		double tolerance_first = 0, tolerance_max = 0.5, tolerance_dt = 0.1;
+		
 		//1.第一层， 循环可接受的preview 与屏幕的比例差距
 		for (double tolerance_cur = tolerance_first; tolerance_cur <= tolerance_max; tolerance_cur += tolerance_dt) {
 			//2.第二层， 循环所有支持的previewsize

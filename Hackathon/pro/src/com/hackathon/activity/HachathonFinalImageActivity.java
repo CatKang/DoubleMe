@@ -262,9 +262,14 @@ public class HachathonFinalImageActivity extends Activity {
 		
 		//get down image actual size
 		int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
-		int view_width = (int)(screenWidth * (1 - remainScale)) - 2 * margin;
-		int view_height = (int)((float)view_width / wl_radio);
-
+		int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
+		int t_window_width = (int)(screenWidth * (1 - remainScale)) - 2 * margin;
+		int t_window_height = screenHeight  - 2 * margin;
+		//int view_height = (int)((float)view_width / wl_radio);
+		int[] preSize = {whole_image.getWidth(), whole_image.getHeight()};
+		GeometryUtil.uniformScale(preSize, t_window_width, t_window_height);
+		int view_width = preSize[0];
+		int view_height = preSize[1];
 		
 		float shrink_radio =  (float)view_width / (float)whole_image.getWidth() ;
 		
