@@ -258,7 +258,7 @@ public class HachathonFinalImageActivity extends Activity {
 		Bitmap right_image = FileUtil.loadBitmapFromFile("right");
 		
 		//get width-length radio
-		float wl_radio = (float)whole_image.getWidth() / (float)whole_image.getHeight();
+		//float wl_radio = (float)whole_image.getWidth() / (float)whole_image.getHeight();
 		
 		//get down image actual size
 		int screenWidth = getWindowManager().getDefaultDisplay().getWidth();

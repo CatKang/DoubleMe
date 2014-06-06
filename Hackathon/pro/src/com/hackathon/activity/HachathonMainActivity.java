@@ -38,7 +38,6 @@ import com.hackathon.entity.HkWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
 
-
 public class HachathonMainActivity extends Activity implements
 		SurfaceHolder.Callback, OnTouchListener {
 	private static String TAG = "HMainActivity";
@@ -56,8 +55,7 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView moveImage;
 	private Button noButton;
 	private Button takephotoButton;
-	
-	
+
 	HkWindow curWindow;
 	int flag = 0;
 	Size pictureSize;
@@ -65,12 +63,12 @@ public class HachathonMainActivity extends Activity implements
 	int windowSize_width;
 	int windowSize_height;
 
-	
-	//for frame drag
+	// for frame drag
 	boolean isSetFrame = false, can_drag = true;
 	int lastX, lastY;
 	TextView text;
-	//for frame drag end
+
+	// for frame drag end
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,15 +86,16 @@ public class HachathonMainActivity extends Activity implements
 		left = (FrameLayout) findViewById(R.id.left);
 		right = (FrameLayout) findViewById(R.id.right);
 		leftImage = (ImageView) findViewById(R.id.imageLeft);
-		text = (TextView) findViewById(R.id.text);	
-		xiangjiImage = (ImageView)findViewById(R.id.imageXiangji);
-		moveImage = (ImageView)findViewById(R.id.imageMove);
+		text = (TextView) findViewById(R.id.text);
+		xiangjiImage = (ImageView) findViewById(R.id.imageXiangji);
+		moveImage = (ImageView) findViewById(R.id.imageMove);
 		surfaceView = (SurfaceView) this.findViewById(R.id.camera);
 		setStatus("initial");
-		
+
 		takephotoButton.setOnClickListener(new OnClickListener() {
-	
+
 			public void onClick(View v) {
+				takephotoButton.setEnabled(false);
 				// TODO Auto-generated method stub
 				if (flag == 0) {
 					camera.takePicture(shutterCallback, rawCallback,
@@ -109,13 +108,15 @@ public class HachathonMainActivity extends Activity implements
 					xiangjiImage.setVisibility(View.GONE);
 					moveImage.setVisibility(View.GONE);
 					leftImage.setVisibility(View.VISIBLE);
-					//floatImage.setBackgroundColor(Color.TRANSPARENT);
+					// floatImage.setBackgroundColor(Color.TRANSPARENT);
+					camera.stopPreview();
 					camera.startPreview();
 				} else if (flag == 2) {
 					camera.takePicture(shutterCallback, rawCallback,
 							jpegCallback);
 				}
 				flag++;
+				takephotoButton.setEnabled(true);
 			}
 		});
 
@@ -123,48 +124,52 @@ public class HachathonMainActivity extends Activity implements
 		SurfaceHolder holder = surfaceView.getHolder();
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		holder.addCallback(this);
-		
-		
-	}
 
+	}
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		Toast.makeText(getApplicationContext(), "In onWindowFocusChanged", 100).show();
-		GeometryUtil.uniformScale(previewSize, windowSize_width, windowSize_height);
-		surfaceView.setLayoutParams(new FrameLayout.LayoutParams(previewSize.width, previewSize.height));
-		mainLayout.setLayoutParams(new FrameLayout.LayoutParams(previewSize.width, previewSize.height));
-		//Toast.makeText(getApplicationContext(), previewSize.width + ", " + previewSize.height, 100).show();
-		//surfaceView.setLayoutParams(new FrameLayout.LayoutParams(previewSize.width, previewSize.height));
-		//mainLayout.setLayoutParams(new FrameLayout.LayoutParams(previewSize.width, previewSize.height));
-		curWindow = new HkWindow(surfaceView, previewSize.width, previewSize.height);
-		left.setLayoutParams(new LinearLayout.LayoutParams(curWindow.viewWidth / 2, curWindow.viewHeight));
-		right.setLayoutParams(new LinearLayout.LayoutParams(curWindow.viewWidth / 2, curWindow.viewHeight));
-	    super.onWindowFocusChanged(hasFocus);
+
+		GeometryUtil.uniformScale(previewSize, windowSize_width,
+				windowSize_height);
+		surfaceView.setLayoutParams(new FrameLayout.LayoutParams(
+				previewSize.width, previewSize.height));
+		mainLayout.setLayoutParams(new FrameLayout.LayoutParams(
+				previewSize.width, previewSize.height));
+		// Toast.makeText(getApplicationContext(), previewSize.width + ", " +
+		// previewSize.height, 100).show();
+		// surfaceView.setLayoutParams(new
+		// FrameLayout.LayoutParams(previewSize.width, previewSize.height));
+		// mainLayout.setLayoutParams(new
+		// FrameLayout.LayoutParams(previewSize.width, previewSize.height));
+		curWindow = new HkWindow(surfaceView, previewSize.width,
+				previewSize.height);
+		left.setLayoutParams(new LinearLayout.LayoutParams(
+				curWindow.viewWidth / 2, curWindow.viewHeight));
+		right.setLayoutParams(new LinearLayout.LayoutParams(
+				curWindow.viewWidth / 2, curWindow.viewHeight));
+		super.onWindowFocusChanged(hasFocus);
 	}
 
-	
 	private void setStatus(String input) {
 		if ("initial".equals(input)) {
-			windowSize_width = getWindowManager().getDefaultDisplay().getWidth();
-			windowSize_height = getWindowManager().getDefaultDisplay().getHeight();
+			windowSize_width = getWindowManager().getDefaultDisplay()
+					.getWidth();
+			windowSize_height = getWindowManager().getDefaultDisplay()
+					.getHeight();
 			takephotoButton.setX(windowSize_width - 200);
 			takephotoButton.setY((windowSize_height - 50) / 2 - 50);
 
-		} 
-	}
-	
-	
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		// TODO 自动生成方法存根
+		}
 	}
 
-	
-	
-	
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+	}
+
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 自动生成方法存根
+		
 		camera = Camera.open();
 		try {
 			camera.setPreviewDisplay(holder);
@@ -175,35 +180,39 @@ public class HachathonMainActivity extends Activity implements
 					.getSupportedPreviewSizes();
 			List<Camera.Size> s_pictureSize = parameters
 					.getSupportedPictureSizes();
-			boolean vet = setPreveiewAndPictureSize(s_previewSize, s_pictureSize, windowSize_height);
-			if (vet == false)
-			{
-				//TODO exit
-				Toast.makeText(getBaseContext(), "Fatal Error! Exit!", 100).show();
-				
+			boolean vet = setPreveiewAndPictureSize(s_previewSize,
+					s_pictureSize, windowSize_height);
+			if (vet == false) {
+				// TODO exit
+				Toast.makeText(getBaseContext(), "Fatal Error! Exit!", 100)
+						.show();
+
 			}
 			FileUtil.recordSupportSize(s_previewSize, s_pictureSize);
-			
-			
-//			previewSize = GeometryUtil.getOptimalSize(
-//					s_previewSize, windowSize_width, windowSize_height);
-//			previewSize.width = 960;
-//			previewSize.height = 720;
-//			
-			
-//			pictureSize = GeometryUtil.getOptimalSize(
-//					s_pictureSize,  windowSize_width, windowSize_height);
-//			pictureSize.width = 2048;
-//			pictureSize.height = 1536;
-			
-			//record env.log
-			FileUtil.recordEnv("PreviewSize: ("+ previewSize.width + " , " + previewSize.height +")");
-			FileUtil.recordEnv("PictureSize: ("+ pictureSize.width + " , " + pictureSize.height +")");
-			FileUtil.recordEnv("WindowSize: ("+ windowSize_width + " , " + windowSize_height +")");
-			
+
+			// previewSize = GeometryUtil.getOptimalSize(
+			// s_previewSize, windowSize_width, windowSize_height);
+			// previewSize.width = 960;
+			// previewSize.height = 720;
+			//
+
+			// pictureSize = GeometryUtil.getOptimalSize(
+			// s_pictureSize, windowSize_width, windowSize_height);
+			// pictureSize.width = 2048;
+			// pictureSize.height = 1536;
+
+			// record env.log
+			FileUtil.recordEnv("PreviewSize: (" + previewSize.width + " , "
+					+ previewSize.height + ")");
+			FileUtil.recordEnv("PictureSize: (" + pictureSize.width + " , "
+					+ pictureSize.height + ")");
+			FileUtil.recordEnv("WindowSize: (" + windowSize_width + " , "
+					+ windowSize_height + ")");
+
 			parameters.setPreviewSize(previewSize.width, previewSize.height);
 			try {
-				parameters.setPictureSize(pictureSize.width, pictureSize.height);
+				parameters
+						.setPictureSize(pictureSize.width, pictureSize.height);
 				camera.setParameters(parameters);
 				camera.setPreviewDisplay(holder);
 				// camera.startPreview();
@@ -219,10 +228,14 @@ public class HachathonMainActivity extends Activity implements
 
 	}
 
-
 	public void surfaceDestroyed(SurfaceHolder holder) {
+		Toast.makeText(getApplicationContext(), "surfaceStop", 100).show();
 		// TODO 自动生成方法存根
-		camera.release();
+		if (camera != null) {
+			
+			camera.release();
+		}
+
 	}
 
 	private ShutterCallback shutterCallback = new ShutterCallback() {
@@ -244,12 +257,13 @@ public class HachathonMainActivity extends Activity implements
 
 			Bitmap bm = BitmapFactory.decodeByteArray(_data, 0, _data.length);
 			if (flag == 1) {
-				ImageSize sizes = curWindow.getImageSize("left", pictureSize.width,
-						pictureSize.height);
+				ImageSize sizes = curWindow.getImageSize("left",
+						pictureSize.width, pictureSize.height);
 
 				Bitmap targetbm_left = Bitmap.createBitmap(bm, sizes.x,
 						sizes.y, sizes.width, sizes.height);
-				sizes = curWindow.getImageSize("right", pictureSize.width, pictureSize.height);
+				sizes = curWindow.getImageSize("right", pictureSize.width,
+						pictureSize.height);
 				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
 						sizes.y, sizes.width, sizes.height);
 
@@ -259,7 +273,7 @@ public class HachathonMainActivity extends Activity implements
 
 				leftImage.setVisibility(View.VISIBLE);
 				leftImage.setImageBitmap(targetbm_left);
-//				xiangjiImage.setVisibility(View.VISIBLE);
+				// xiangjiImage.setVisibility(View.VISIBLE);
 				moveImage.setVisibility(View.GONE);
 				rightImage.setBackgroundColor(Color.BLACK);
 				rightImage.getBackground().setAlpha(200);
@@ -270,28 +284,32 @@ public class HachathonMainActivity extends Activity implements
 				floatImage.setAlpha(99);
 				noButton.setOnClickListener(new OnClickListener() {
 
-
 					public void onClick(View v) {
+						noButton.setEnabled(false);
 						// TODO Auto-generated method stub
 						leftImage.setVisibility(View.GONE);
 						noButton.setVisibility(View.GONE);
 						rightImage.setVisibility(View.VISIBLE);
-						rightImage.setBackgroundResource(R.drawable.shadow_right);
+						rightImage
+								.setBackgroundResource(R.drawable.shadow_right);
 						moveImage.setVisibility(View.VISIBLE);
 						floatImage.setVisibility(View.INVISIBLE);
 						xiangjiImage.setVisibility(View.GONE);
 						flag = 0;
 						can_drag = true;
 						camera.startPreview();
+						noButton.setEnabled(true);
 					}
 				});
 			} else {
-				ImageSize sizes = curWindow.getImageSize("right", pictureSize.width,
-						pictureSize.height);
+				ImageSize sizes = curWindow.getImageSize("right",
+						pictureSize.width, pictureSize.height);
 				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
 						sizes.y, sizes.width, sizes.height);
 				FileUtil.memoryOneImage(targetbm_right, "right");
-				Intent finalImageIntent = new Intent(HachathonMainActivity.this, HachathonFinalImageActivity.class);
+				Intent finalImageIntent = new Intent(
+						HachathonMainActivity.this,
+						HachathonFinalImageActivity.class);
 				finalImageIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 				finalImageIntent.putExtra("HkWindow", curWindow);
 				startActivity(finalImageIntent);
@@ -346,53 +364,53 @@ public class HachathonMainActivity extends Activity implements
 		}
 		return true;
 	}
-	
-	
-	
-	/**	
-	 * set the Optimal previewSize and pictureSize
-	 * 1，找跟屏幕比例最接近的preview size
-	 * 2，找与选中的preview size 一致的 picture size
-	 * 3，在符合条件的picture size 中找与target_pic_height 最接近的尺寸
-	 * 3，设置previewSize pictureSize
-	 * @param s_previewSize 所有支持的preview size
-	 * @param s_pictureSize 所有支持的picture size
-	 * @param target_pic_height 目标图片比例
+
+	/**
+	 * set the Optimal previewSize and pictureSize 1，找跟屏幕比例最接近的preview size
+	 * 2，找与选中的preview size 一致的 picture size 3，在符合条件的picture size
+	 * 中找与target_pic_height 最接近的尺寸 3，设置previewSize pictureSize
+	 * 
+	 * @param s_previewSize
+	 *            所有支持的preview size
+	 * @param s_pictureSize
+	 *            所有支持的picture size
+	 * @param target_pic_height
+	 *            目标图片比例
 	 * @return 找到合适的返回true。 否则false
 	 */
-	private boolean setPreveiewAndPictureSize(List<Camera.Size> s_previewSize, List<Camera.Size> s_pictureSize, int target_pic_height)
-	{
+	private boolean setPreveiewAndPictureSize(List<Camera.Size> s_previewSize,
+			List<Camera.Size> s_pictureSize, int target_pic_height) {
 		double precision = 0.00001;
 		double windowSize_ratio = (double) windowSize_width / windowSize_height;
 		double tolerance_first = 0, tolerance_max = 0.5, tolerance_dt = 0.1;
-		
-		//1.第一层， 循环可接受的preview 与屏幕的比例差距
+
+		// 1.第一层， 循环可接受的preview 与屏幕的比例差距
 		for (double tolerance_cur = tolerance_first; tolerance_cur <= tolerance_max; tolerance_cur += tolerance_dt) {
-			//2.第二层， 循环所有支持的previewsize
-			for (Size preSize : s_previewSize) {			
-				double preRatio = (double) preSize.width / (double)preSize.height;
+			// 2.第二层， 循环所有支持的previewsize
+			for (Size preSize : s_previewSize) {
+				double preRatio = (double) preSize.width
+						/ (double) preSize.height;
 				if (Math.abs(preRatio - windowSize_ratio) - tolerance_cur > precision)
 					continue;
-				//找到最可接受的preview size， 用这个size 尝试去找同比例的picture size
+				// 找到最可接受的preview size， 用这个size 尝试去找同比例的picture size
 				int min_diff = target_pic_height;
 				Size cur_best_pic = null;
-				//3.第三层， 循环所有支持的picturesize
-				for (Size picSize : s_pictureSize)
-				{
-					double picRatio = (double) picSize.width / (double)picSize.height;
-					
-					if (Math.abs(picRatio - preRatio) <= precision)
-					{
-						//preview size 与 picture size 相等
-						if (cur_best_pic == null || Math.abs(picSize.height - target_pic_height) < min_diff)
-						{
-							min_diff = Math.abs(picSize.height - target_pic_height);
-							cur_best_pic = picSize;	
+				// 3.第三层， 循环所有支持的picturesize
+				for (Size picSize : s_pictureSize) {
+					double picRatio = (double) picSize.width
+							/ (double) picSize.height;
+
+					if (Math.abs(picRatio - preRatio) <= precision) {
+						// preview size 与 picture size 相等
+						if (cur_best_pic == null
+								|| Math.abs(picSize.height - target_pic_height) < min_diff) {
+							min_diff = Math.abs(picSize.height
+									- target_pic_height);
+							cur_best_pic = picSize;
 						}
 					}
 				}
-				if(cur_best_pic != null)
-				{
+				if (cur_best_pic != null) {
 					previewSize = preSize;
 					pictureSize = cur_best_pic;
 					return true;
@@ -400,5 +418,5 @@ public class HachathonMainActivity extends Activity implements
 			}
 		}
 		return false;
-	}	
+	}
 }
