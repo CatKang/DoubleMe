@@ -52,15 +52,17 @@ public class HachathonFinalImageActivity extends Activity {
 	private ProgressBar progressBar;
 	private FrameLayout myLayoutLeft;
 	private FrameLayout mBottomPhotoFrameLayout;
-
 	private CropBoxView cropBoxView;
-	
 	private FinalImageWindow finalImageWindow;
 	public ImageSize cropBox;
 	
-	private float moreScale = (float) 0.12;    //左边图片多给的比例
-	private float remainScale = (float) 0.10;  //右侧边栏的比例
-	private int margin = 60;
+	
+
+	private final float ZOOMINMAXSCALE =(float)3.0;  //右侧图片放大比例上限
+	private final float ZOOMOUTMINSCALE =(float)0.3; //右侧图盘缩小比例下限
+	private final float MORESCALE = (float) 0.12;    //左边图片多给的比例
+	private final float REMAINSCALE = (float) 0.10;  //右侧边栏的比例
+	private final int MARGIN = 60;
 	
 	/* ImageViewRight onTouch */
 	// boolean isFit = false;
@@ -68,8 +70,6 @@ public class HachathonFinalImageActivity extends Activity {
 	Matrix savedMatrix = new Matrix();
 	DisplayMetrics dm;
 	Bitmap bitmap;
-	float minScaleR;// 最小缩放比例
-	static final float MAX_SCALE = 4f;// 最大缩放比例
 	static final int NONE = 0;// 初始状态
 	static final int DRAG = 1;// 拖动
 	static final int ZOOM = 2;// 缩放
@@ -140,6 +140,7 @@ public class HachathonFinalImageActivity extends Activity {
 							matrix.postScale(tScale, tScale, mid.x, mid.y);
 						}
 					}
+					boundRightImageInFrame(matrix);
 					break;
 				}
 				myImageFinalRight.setImageMatrix(matrix);
@@ -263,8 +264,8 @@ public class HachathonFinalImageActivity extends Activity {
 		//get down image actual size
 		int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
 		int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
-		int t_window_width = (int)(screenWidth * (1 - remainScale)) - 2 * margin;
-		int t_window_height = screenHeight  - 2 * margin;
+		int t_window_width = (int)(screenWidth * (1 - REMAINSCALE)) - 2 * MARGIN;
+		int t_window_height = screenHeight  - 2 * MARGIN;
 		//int view_height = (int)((float)view_width / wl_radio);
 		int[] preSize = {whole_image.getWidth(), whole_image.getHeight()};
 		GeometryUtil.uniformScale(preSize, t_window_width, t_window_height);
@@ -280,9 +281,9 @@ public class HachathonFinalImageActivity extends Activity {
 		int left_view_width = view_width - right_view_width;
 		
 		//initial FinalImageWindow
-		finalImageWindow = new FinalImageWindow(margin, margin, view_width, view_height);
+		finalImageWindow = new FinalImageWindow(MARGIN, MARGIN, view_width, view_height);
 		finalImageWindow.leftWidth = left_view_width;
-		cropBox = new ImageSize(margin, margin, view_width, view_height);
+		cropBox = new ImageSize(MARGIN, MARGIN, view_width, view_height);
 		
 		//get image
 		Matrix right_matrix = new Matrix();
@@ -294,7 +295,7 @@ public class HachathonFinalImageActivity extends Activity {
 		
 		//paint this three view
 		LinearLayout.LayoutParams parameterDown = new LinearLayout.LayoutParams(view_width, view_height);
-		parameterDown.leftMargin = parameterDown.topMargin = margin;
+		parameterDown.leftMargin = parameterDown.topMargin = MARGIN;
 		mBottomPhotoFrameLayout.setLayoutParams(parameterDown);
 		myImageFinalRight.setLayoutParams(new LinearLayout.LayoutParams(right_view_width, view_height));
 		myLayoutLeft.setLayoutParams(new LinearLayout.LayoutParams(left_view_width,view_height));
@@ -314,7 +315,7 @@ public class HachathonFinalImageActivity extends Activity {
 		ImageSize size_left = sizes.get(0);
 		ImageSize size_right = sizes.get(1);
 		myImageFinalRight.setDrawingCacheEnabled(false);
-		int morePix = (int)(finalImageWindow.viewWidth * moreScale);
+		int morePix = (int)(finalImageWindow.viewWidth * MORESCALE);
 		cropBox.change(finalImageWindow.viewX + size_left.x, finalImageWindow.viewY + size_left.y, size_left.width - morePix + size_right.width, size_right.height);
 		paintCropBox();
 	}
@@ -389,6 +390,35 @@ public class HachathonFinalImageActivity extends Activity {
 		}
 	};
 
+	private boolean boundRightImageInFrame(Matrix m)
+	{
+		int dw = myImageFinalRight.getDrawable().getBounds().width();
+		int dh = myImageFinalRight.getDrawable().getBounds().height();
+		float[] values = new float[9];
+		m.getValues(values);
+		float sx = values[0];
+		float sy = values[4];
+		Log.d("lxy", "scale_X = " + sx + ", scale_Y = " + sy);
+		int image_dx = (int) values[2];
+		int image_dy = (int) values[5];
+		//check and set the zoom scale 
+		if (sx > ZOOMINMAXSCALE )
+		{
+			float newScale = ZOOMINMAXSCALE / sx;
+			matrix.postScale(newScale, newScale, mid.x, mid.y);
+			return false;
+		}else if (sx < ZOOMOUTMINSCALE)
+		{
+			float newScale = ZOOMOUTMINSCALE / sx;
+			matrix.postScale(newScale, newScale, mid.x, mid.y);
+			return false;
+		}
+		
+		//check and set the location
+
+		return true;
+	}
+	
 	private void getProcessPicture() {
 		
 		myImageFinalDown.setDrawingCacheEnabled(true);
@@ -435,7 +465,7 @@ public class HachathonFinalImageActivity extends Activity {
 		// calculate left image size
 		int x_left = 0;
 		int y_left = (image_dy < 0) ? 0 : image_dy;
-		int morePix = (int) (finalImageWindow.viewWidth * moreScale);
+		int morePix = (int) (finalImageWindow.viewWidth * MORESCALE);
 		int width_left = finalImageWindow.leftWidth
 				+ ((image_dx > 0) ? image_dx : 0) + morePix;
 		if (width_left > finalImageWindow.viewWidth)
@@ -480,7 +510,7 @@ public class HachathonFinalImageActivity extends Activity {
 	{
 		Bitmap final_left = FileUtil.loadBitmapFromFile("final_left");
 		Bitmap final_right = FileUtil.loadBitmapFromFile("final_right");
-		int morePix = (int)(finalImageWindow.viewWidth * moreScale);
+		int morePix = (int)(finalImageWindow.viewWidth * MORESCALE);
 		int tmp_width = final_left.getWidth() - morePix;
 		Bitmap result = Bitmap.createBitmap(tmp_width + final_right.getWidth(), final_left.getHeight(),
 				Config.RGB_565);

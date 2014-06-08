@@ -27,7 +27,9 @@ public class GeometryUtil {
 		float y = event.getY(0) + event.getY(1);
 		point.set(x / 2, y / 2);
 	}
-
+	
+	
+	
 //	public static Size getOptimalSize(List<Size> sizes, int veiw_width,
 //			int view_height) {
 //		double targetRatio = (double) veiw_width / view_height;
