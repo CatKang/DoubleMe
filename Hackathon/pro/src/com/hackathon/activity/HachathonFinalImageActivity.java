@@ -57,7 +57,7 @@ public class HachathonFinalImageActivity extends Activity {
 	public ImageSize cropBox;
 	
 	
-
+	private final float MOVEREMAINSCALE = (float)0.2; //移动后留在屏幕内部的比例
 	private final float ZOOMINMAXSCALE =(float)3.0;  //右侧图片放大比例上限
 	private final float ZOOMOUTMINSCALE =(float)0.3; //右侧图盘缩小比例下限
 	private final float MORESCALE = (float) 0.12;    //左边图片多给的比例
@@ -401,6 +401,9 @@ public class HachathonFinalImageActivity extends Activity {
 		Log.d("lxy", "scale_X = " + sx + ", scale_Y = " + sy);
 		int image_dx = (int) values[2];
 		int image_dy = (int) values[5];
+		int image_width = (int) (dw * sx);
+		int image_height = (int) (dh * sy);
+		
 		//check and set the zoom scale 
 		if (sx > ZOOMINMAXSCALE )
 		{
@@ -415,8 +418,34 @@ public class HachathonFinalImageActivity extends Activity {
 		}
 		
 		//check and set the location
-
-		return true;
+		boolean noError = true;
+		int remain_width = (int)(image_width * MOVEREMAINSCALE);
+		int remain_height = (int)(image_height * MOVEREMAINSCALE);
+		if (image_dx < 0 && image_width + image_dx <= remain_width)
+		{
+			int new_dx = image_width - remain_width;
+			matrix.postTranslate((-1) * image_dx - new_dx, 0);
+			noError = false;
+		}else if (image_dx > 0 && dw - image_dx <= remain_width)
+		{
+			int new_dx = dw - remain_width;
+			matrix.postTranslate(new_dx - image_dx, 0);
+			noError = false;
+		}
+		
+		if (image_dy < 0 && image_height + image_dy <= remain_height)
+		{
+			int new_dy = image_height - remain_height;
+			matrix.postTranslate(0,(-1) * image_dy - new_dy);
+			noError = false;
+		}else if (image_dy > 0 && dh - image_dy <= remain_height)
+		{
+			int new_dy = dh - remain_height;
+			matrix.postTranslate(0, new_dy - image_dy);
+			noError = false;
+		}
+		
+		return noError;
 	}
 	
 	private void getProcessPicture() {
