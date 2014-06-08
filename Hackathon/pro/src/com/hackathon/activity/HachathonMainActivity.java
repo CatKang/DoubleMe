@@ -13,6 +13,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -55,6 +56,9 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView moveImage;
 	private Button noButton;
 	private Button takephotoButton;
+	
+	private ImageView picFrameImageL;
+	private ImageView picFrameImageR;
 
 	HkWindow curWindow;
 	int flag = 0;
@@ -89,6 +93,11 @@ public class HachathonMainActivity extends Activity implements
 		text = (TextView) findViewById(R.id.text);
 		xiangjiImage = (ImageView) findViewById(R.id.imageXiangji);
 		moveImage = (ImageView) findViewById(R.id.imageMove);
+		picFrameImageL = (ImageView)findViewById(R.id.picFrameImageL);
+		picFrameImageR = (ImageView)findViewById(R.id.picFrameImageR);
+		picFrameImageL.setVisibility(View.VISIBLE);
+		picFrameImageR.setVisibility(View.GONE);
+//		moveImage.setBackgroundResource(R.drawable.bai);
 		surfaceView = (SurfaceView) this.findViewById(R.id.camera);
 		setStatus("initial");
 
@@ -101,21 +110,47 @@ public class HachathonMainActivity extends Activity implements
 					camera.takePicture(shutterCallback, rawCallback,
 							jpegCallback);
 					can_drag = false;
-				} else if (flag == 1) {
-					noButton.setVisibility(View.INVISIBLE);
-					floatImage.setVisibility(View.VISIBLE);
-					rightImage.setVisibility(View.INVISIBLE);
-					xiangjiImage.setVisibility(View.GONE);
-					moveImage.setVisibility(View.GONE);
-					leftImage.setVisibility(View.VISIBLE);
-					// floatImage.setBackgroundColor(Color.TRANSPARENT);
-					camera.stopPreview();
-					camera.startPreview();
-				} else if (flag == 2) {
+//					camera.stopPreview();
+//					camera.startPreview();
+				}
+				else if(flag == 1)
+				{
+//					leftImage.setVisibility(View.VISIBLE);
+//					rightImage.setVisibility(View.INVISIBLE);
+//					floatImage.setVisibility(View.VISIBLE);
+//					picFrameImageL.setVisibility(View.GONE);
+//					picFrameImageR.setVisibility(View.VISIBLE);
+					
 					camera.takePicture(shutterCallback, rawCallback,
 							jpegCallback);
+					Camera.Parameters parameters = camera.getParameters();
+					if(parameters.isAutoExposureLockSupported())
+					{
+						parameters.setAutoExposureLock(true);
+					}
 				}
-				flag++;
+//				} else if (flag == 1) {
+//					noButton.setVisibility(View.INVISIBLE);
+//					floatImage.setVisibility(View.VISIBLE);
+//					rightImage.setVisibility(View.INVISIBLE);
+//					xiangjiImage.setVisibility(View.GONE);
+//					moveImage.setVisibility(View.GONE);
+//					leftImage.setVisibility(View.VISIBLE);
+//					// floatImage.setBackgroundColor(Color.TRANSPARENT);
+//					camera.stopPreview();
+//					camera.startPreview();
+//					picFrameImageL.setVisibility(View.GONE);
+//					picFrameImageR.setVisibility(View.VISIBLE);
+//					Camera.Parameters parameters = camera.getParameters();
+//					if(parameters.isAutoExposureLockSupported())
+//					{
+//						parameters.setAutoExposureLock(false);
+//					}
+//				} else if (flag == 2) {
+//					camera.takePicture(shutterCallback, rawCallback,
+//							jpegCallback);
+//				}
+//				flag++;
 				takephotoButton.setEnabled(true);
 			}
 		});
@@ -150,6 +185,7 @@ public class HachathonMainActivity extends Activity implements
 				curWindow.viewWidth / 2, curWindow.viewHeight));
 		super.onWindowFocusChanged(hasFocus);
 	}
+
 
 	private void setStatus(String input) {
 		if ("initial".equals(input)) {
@@ -250,13 +286,16 @@ public class HachathonMainActivity extends Activity implements
 		}
 	};
 
+
 	private PictureCallback jpegCallback = new PictureCallback() {
 		public void onPictureTaken(byte[] _data, Camera _camera) {
 			// Toast.makeText(getApplicationContext(), "jepgCallback",
 			// 100).show();
 
 			Bitmap bm = BitmapFactory.decodeByteArray(_data, 0, _data.length);
-			if (flag == 1) {
+			if (flag == 0) {
+				flag = 1;
+				
 				ImageSize sizes = curWindow.getImageSize("left",
 						pictureSize.width, pictureSize.height);
 
@@ -275,11 +314,15 @@ public class HachathonMainActivity extends Activity implements
 				leftImage.setImageBitmap(targetbm_left);
 				// xiangjiImage.setVisibility(View.VISIBLE);
 				moveImage.setVisibility(View.GONE);
-				rightImage.setBackgroundColor(Color.BLACK);
-				rightImage.getBackground().setAlpha(200);
-				rightImage.setVisibility(View.VISIBLE);
-				noButton.setVisibility(View.VISIBLE);
+				picFrameImageL.setVisibility(View.GONE);
+				picFrameImageR.setVisibility(View.VISIBLE);
+				rightImage.setVisibility(View.INVISIBLE);
 				floatImage.setVisibility(View.INVISIBLE);
+//				rightImage.setBackgroundColor(Color.BLACK);
+//				rightImage.getBackground().setAlpha(200);
+//				rightImage.setVisibility(View.VISIBLE);
+				noButton.setVisibility(View.INVISIBLE);
+				floatImage.setVisibility(View.VISIBLE);
 				floatImage.setImageBitmap(targetbm_right);
 				floatImage.setAlpha(99);
 				noButton.setOnClickListener(new OnClickListener() {
@@ -295,18 +338,29 @@ public class HachathonMainActivity extends Activity implements
 						moveImage.setVisibility(View.VISIBLE);
 						floatImage.setVisibility(View.INVISIBLE);
 						xiangjiImage.setVisibility(View.GONE);
+						picFrameImageL.setVisibility(View.VISIBLE);
+						picFrameImageR.setVisibility(View.GONE);
 						flag = 0;
 						can_drag = true;
 						camera.startPreview();
 						noButton.setEnabled(true);
 					}
 				});
+				Camera.Parameters parameters = camera.getParameters();
+				if(parameters.isAutoExposureLockSupported())
+				{
+					parameters.setAutoExposureLock(false);
+				}
+				camera.stopPreview();
+				camera.startPreview();
 			} else {
+				flag = 0;
 				ImageSize sizes = curWindow.getImageSize("right",
 						pictureSize.width, pictureSize.height);
 				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
 						sizes.y, sizes.width, sizes.height);
 				FileUtil.memoryOneImage(targetbm_right, "right");
+				
 				Intent finalImageIntent = new Intent(
 						HachathonMainActivity.this,
 						HachathonFinalImageActivity.class);
@@ -314,6 +368,7 @@ public class HachathonMainActivity extends Activity implements
 				finalImageIntent.putExtra("HkWindow", curWindow);
 				startActivity(finalImageIntent);
 				camera.release();
+				HachathonMainActivity.this.finish();
 			}
 
 		}
@@ -352,10 +407,10 @@ public class HachathonMainActivity extends Activity implements
 			curWindow.curFrameX += dx;
 			lastX = cx;
 			lastY = cy;
-			text.setText("curFrameX:" + curWindow.curFrameX + "   cx:" + cx
-					+ "  cy:" + cy + "   dx:" + dx + "  paramLeft.width:"
-					+ paramLeft.width + "   paramRight.width:"
-					+ paramRight.width);
+//			text.setText("curFrameX:" + curWindow.curFrameX + "   cx:" + cx
+//					+ "  cy:" + cy + "   dx:" + dx + "  paramLeft.width:"
+//					+ paramLeft.width + "   paramRight.width:"
+//					+ paramRight.width);
 			break;
 
 		case MotionEvent.ACTION_UP:

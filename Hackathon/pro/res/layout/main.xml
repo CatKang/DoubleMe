@@ -53,6 +53,11 @@
                     android:layout_height="fill_parent"
                     android:background="@drawable/shadow_left"
                     android:layout_gravity="right" />
+                <ImageView 
+                    android:id="@+id/picFrameImageL"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/bai"/>
             </FrameLayout>
 
             <FrameLayout
@@ -94,6 +99,11 @@
 			        android:layout_gravity="right"
 			        android:background="@drawable/no"
 			        android:visibility="gone"/>
+                <ImageView 
+                    android:id="@+id/picFrameImageR"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/bai"/>
                 
             </FrameLayout>
         </LinearLayout>
@@ -107,7 +117,7 @@
             android:id="@+id/text"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:textColor="@android:color/holo_green_light"/>
+	        android:textColor="@android:color/darker_gray"/>
     </FrameLayout>
 	 
 </LinearLayout>
