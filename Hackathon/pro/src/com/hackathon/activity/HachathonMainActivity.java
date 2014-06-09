@@ -16,6 +16,7 @@ import android.hardware.Camera.Size;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -126,7 +127,7 @@ public class HachathonMainActivity extends Activity implements
 					Camera.Parameters parameters = camera.getParameters();
 					if(parameters.isAutoExposureLockSupported())
 					{
-						parameters.setAutoExposureLock(true);
+						parameters.setAutoExposureLock(false);
 					}
 				}
 //				} else if (flag == 1) {
@@ -163,6 +164,26 @@ public class HachathonMainActivity extends Activity implements
 	}
 
 	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			Toast.makeText(this, "后退键", Toast.LENGTH_SHORT).show();
+			switch (flag)
+			{
+			case 0:
+				HachathonMainActivity.this.finish();
+				break;
+			case 1:
+				//setStatus("initial");
+				finish();
+				break;
+			}
+			return true;
+		} 
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 
 		GeometryUtil.uniformScale(previewSize, windowSize_width,
@@ -189,6 +210,7 @@ public class HachathonMainActivity extends Activity implements
 
 	private void setStatus(String input) {
 		if ("initial".equals(input)) {
+			flag = 0;
 			windowSize_width = getWindowManager().getDefaultDisplay()
 					.getWidth();
 			windowSize_height = getWindowManager().getDefaultDisplay()
@@ -349,7 +371,7 @@ public class HachathonMainActivity extends Activity implements
 				Camera.Parameters parameters = camera.getParameters();
 				if(parameters.isAutoExposureLockSupported())
 				{
-					parameters.setAutoExposureLock(false);
+					parameters.setAutoExposureLock(true);
 				}
 				camera.stopPreview();
 				camera.startPreview();
@@ -368,7 +390,7 @@ public class HachathonMainActivity extends Activity implements
 				finalImageIntent.putExtra("HkWindow", curWindow);
 				startActivity(finalImageIntent);
 				camera.release();
-				HachathonMainActivity.this.finish();
+				//HachathonMainActivity.this.finish();
 			}
 
 		}
