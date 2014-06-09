@@ -3,6 +3,7 @@ package com.hackathon.activity;
 import com.hackathon.main.R;
 import com.hackathon.main.R.id;
 import com.hackathon.main.R.layout;
+import com.hackathon.worker.HkExceptionHandler;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -23,6 +24,7 @@ public class HachathonFirstActivity extends Activity
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.first);
+		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler()); 
 		doubleButton = (ImageButton)findViewById(R.id.buttondouble);
 		doubleButton.setOnClickListener(new OnClickListener() {
 			

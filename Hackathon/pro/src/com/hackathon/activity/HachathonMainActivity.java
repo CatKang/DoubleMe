@@ -2,7 +2,7 @@ package com.hackathon.activity;
 
 import java.io.IOException;
 import java.util.List;
-
+import com.hackathon.common.util.Log;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,7 +15,6 @@ import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -39,6 +38,7 @@ import com.hackathon.common.util.GeometryUtil;
 import com.hackathon.entity.HkWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
+import com.hackathon.worker.HkExceptionHandler;
 
 public class HachathonMainActivity extends Activity implements
 		SurfaceHolder.Callback, OnTouchListener {
@@ -72,94 +72,94 @@ public class HachathonMainActivity extends Activity implements
 	boolean isSetFrame = false, can_drag = true;
 	int lastX, lastY;
 	TextView text;
-
+	Log log_file = null;
 	// for frame drag end
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.main);
+		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler()); 
 
-		FileUtil.init_file_env();
-		mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
-		frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
-		takephotoButton = (Button) findViewById(R.id.takephotoButton);
-		noButton = (Button) findViewById(R.id.noButton);
-		floatImage = (ImageView) findViewById(R.id.imageFloat);
-		rightImage = (ImageView) findViewById(R.id.imageRight);
-		left = (FrameLayout) findViewById(R.id.left);
-		right = (FrameLayout) findViewById(R.id.right);
-		leftImage = (ImageView) findViewById(R.id.imageLeft);
-		text = (TextView) findViewById(R.id.text);
-		xiangjiImage = (ImageView) findViewById(R.id.imageXiangji);
-		moveImage = (ImageView) findViewById(R.id.imageMove);
-		picFrameImageL = (ImageView)findViewById(R.id.picFrameImageL);
-		picFrameImageR = (ImageView)findViewById(R.id.picFrameImageR);
-		picFrameImageL.setVisibility(View.VISIBLE);
-		picFrameImageR.setVisibility(View.GONE);
-//		moveImage.setBackgroundResource(R.drawable.bai);
-		surfaceView = (SurfaceView) this.findViewById(R.id.camera);
-		setStatus("initial");
+		try {
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			setContentView(R.layout.main);
+			this.initial();
+			mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
+			frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
+			takephotoButton = (Button) findViewById(R.id.takephotoButton);
+			noButton = (Button) findViewById(R.id.noButton);
+			floatImage = (ImageView) findViewById(R.id.imageFloat);
+			rightImage = (ImageView) findViewById(R.id.imageRight);
+			left = (FrameLayout) findViewById(R.id.left);
+			right = (FrameLayout) findViewById(R.id.right);
+			leftImage = (ImageView) findViewById(R.id.imageLeft);
+			text = (TextView) findViewById(R.id.text);
+			xiangjiImage = (ImageView) findViewById(R.id.imageXiangji);
+			moveImage = (ImageView) findViewById(R.id.imageMove);
+			picFrameImageL = (ImageView) findViewById(R.id.picFrameImageL);
+			picFrameImageR = (ImageView) findViewById(R.id.picFrameImageR);
+			picFrameImageL.setVisibility(View.VISIBLE);
+			picFrameImageR.setVisibility(View.GONE);
+			//		moveImage.setBackgroundResource(R.drawable.bai);
+			surfaceView = (SurfaceView) this.findViewById(R.id.camera);
+			setStatus("initial");
+			takephotoButton.setOnClickListener(new OnClickListener() {
 
-		takephotoButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					takephotoButton.setEnabled(false);
+					// TODO Auto-generated method stub
+					if (flag == 0) {
+						camera.takePicture(shutterCallback, rawCallback,
+								jpegCallback);
+						can_drag = false;
+						//					camera.stopPreview();
+						//					camera.startPreview();
+					} else if (flag == 1) {
+						//					leftImage.setVisibility(View.VISIBLE);
+						//					rightImage.setVisibility(View.INVISIBLE);
+						//					floatImage.setVisibility(View.VISIBLE);
+						//					picFrameImageL.setVisibility(View.GONE);
+						//					picFrameImageR.setVisibility(View.VISIBLE);
 
-			public void onClick(View v) {
-				takephotoButton.setEnabled(false);
-				// TODO Auto-generated method stub
-				if (flag == 0) {
-					camera.takePicture(shutterCallback, rawCallback,
-							jpegCallback);
-					can_drag = false;
-//					camera.stopPreview();
-//					camera.startPreview();
-				}
-				else if(flag == 1)
-				{
-//					leftImage.setVisibility(View.VISIBLE);
-//					rightImage.setVisibility(View.INVISIBLE);
-//					floatImage.setVisibility(View.VISIBLE);
-//					picFrameImageL.setVisibility(View.GONE);
-//					picFrameImageR.setVisibility(View.VISIBLE);
-					
-					camera.takePicture(shutterCallback, rawCallback,
-							jpegCallback);
-					Camera.Parameters parameters = camera.getParameters();
-					if(parameters.isAutoExposureLockSupported())
-					{
-						parameters.setAutoExposureLock(false);
+						camera.takePicture(shutterCallback, rawCallback,
+								jpegCallback);
+						Camera.Parameters parameters = camera.getParameters();
+						if (parameters.isAutoExposureLockSupported()) {
+							parameters.setAutoExposureLock(false);
+						}
 					}
+					//				} else if (flag == 1) {
+					//					noButton.setVisibility(View.INVISIBLE);
+					//					floatImage.setVisibility(View.VISIBLE);
+					//					rightImage.setVisibility(View.INVISIBLE);
+					//					xiangjiImage.setVisibility(View.GONE);
+					//					moveImage.setVisibility(View.GONE);
+					//					leftImage.setVisibility(View.VISIBLE);
+					//					// floatImage.setBackgroundColor(Color.TRANSPARENT);
+					//					camera.stopPreview();
+					//					camera.startPreview();
+					//					picFrameImageL.setVisibility(View.GONE);
+					//					picFrameImageR.setVisibility(View.VISIBLE);
+					//					Camera.Parameters parameters = camera.getParameters();
+					//					if(parameters.isAutoExposureLockSupported())
+					//					{
+					//						parameters.setAutoExposureLock(false);
+					//					}
+					//				} else if (flag == 2) {
+					//					camera.takePicture(shutterCallback, rawCallback,
+					//							jpegCallback);
+					//				}
+					//				flag++;
+					takephotoButton.setEnabled(true);
 				}
-//				} else if (flag == 1) {
-//					noButton.setVisibility(View.INVISIBLE);
-//					floatImage.setVisibility(View.VISIBLE);
-//					rightImage.setVisibility(View.INVISIBLE);
-//					xiangjiImage.setVisibility(View.GONE);
-//					moveImage.setVisibility(View.GONE);
-//					leftImage.setVisibility(View.VISIBLE);
-//					// floatImage.setBackgroundColor(Color.TRANSPARENT);
-//					camera.stopPreview();
-//					camera.startPreview();
-//					picFrameImageL.setVisibility(View.GONE);
-//					picFrameImageR.setVisibility(View.VISIBLE);
-//					Camera.Parameters parameters = camera.getParameters();
-//					if(parameters.isAutoExposureLockSupported())
-//					{
-//						parameters.setAutoExposureLock(false);
-//					}
-//				} else if (flag == 2) {
-//					camera.takePicture(shutterCallback, rawCallback,
-//							jpegCallback);
-//				}
-//				flag++;
-				takephotoButton.setEnabled(true);
-			}
-		});
-
-		surfaceView.setOnTouchListener(this);
-		SurfaceHolder holder = surfaceView.getHolder();
-		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		holder.addCallback(this);
+			});
+			surfaceView.setOnTouchListener(this);
+			SurfaceHolder holder = surfaceView.getHolder();
+			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+			holder.addCallback(this);
+		} catch (Exception e) {
+			log_file.saveLog(e, "HachathonMainActivity");
+		}
 
 	}
 
@@ -181,6 +181,12 @@ public class HachathonMainActivity extends Activity implements
 			return true;
 		} 
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	private void initial()
+	{
+		FileUtil.init_file_env();
+		log_file = new Log();
 	}
 	
 	@Override
@@ -314,83 +320,91 @@ public class HachathonMainActivity extends Activity implements
 			// Toast.makeText(getApplicationContext(), "jepgCallback",
 			// 100).show();
 
-			Bitmap bm = BitmapFactory.decodeByteArray(_data, 0, _data.length);
-			if (flag == 0) {
-				flag = 1;
-				
-				ImageSize sizes = curWindow.getImageSize("left",
-						pictureSize.width, pictureSize.height);
+			try {
+				log_file.saveLog("image data_length : " + _data.length);
+				Bitmap bm = BitmapFactory.decodeByteArray(_data, 0,
+						_data.length);
+				//Bitmap bm = BitmapFactory.decodeByteArray(_data, 0,
+				//		_data.length);
+				if (flag == 0) {
+					flag = 1;
 
-				Bitmap targetbm_left = Bitmap.createBitmap(bm, sizes.x,
-						sizes.y, sizes.width, sizes.height);
-				sizes = curWindow.getImageSize("right", pictureSize.width,
-						pictureSize.height);
-				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
-						sizes.y, sizes.width, sizes.height);
+					ImageSize sizes = curWindow.getImageSize("left",
+							pictureSize.width, pictureSize.height);
 
-				FileUtil.memoryOneImage(targetbm_left, "left");
-				FileUtil.memoryOneImage(targetbm_right, "float");
-				FileUtil.memoryOneImage(bm, "whole");
+					Bitmap targetbm_left = Bitmap.createBitmap(bm, sizes.x,
+							sizes.y, sizes.width, sizes.height);
+					sizes = curWindow.getImageSize("right", pictureSize.width,
+							pictureSize.height);
+					Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
+							sizes.y, sizes.width, sizes.height);
 
-				leftImage.setVisibility(View.VISIBLE);
-				leftImage.setImageBitmap(targetbm_left);
-				// xiangjiImage.setVisibility(View.VISIBLE);
-				moveImage.setVisibility(View.GONE);
-				picFrameImageL.setVisibility(View.GONE);
-				picFrameImageR.setVisibility(View.VISIBLE);
-				rightImage.setVisibility(View.INVISIBLE);
-				floatImage.setVisibility(View.INVISIBLE);
-//				rightImage.setBackgroundColor(Color.BLACK);
-//				rightImage.getBackground().setAlpha(200);
-//				rightImage.setVisibility(View.VISIBLE);
-				noButton.setVisibility(View.INVISIBLE);
-				floatImage.setVisibility(View.VISIBLE);
-				floatImage.setImageBitmap(targetbm_right);
-				floatImage.setAlpha(99);
-				noButton.setOnClickListener(new OnClickListener() {
+					FileUtil.memoryOneImage(targetbm_left, "left");
+					FileUtil.memoryOneImage(targetbm_right, "float");
+					FileUtil.memoryOneImage(bm, "whole");
 
-					public void onClick(View v) {
-						noButton.setEnabled(false);
-						// TODO Auto-generated method stub
-						leftImage.setVisibility(View.GONE);
-						noButton.setVisibility(View.GONE);
-						rightImage.setVisibility(View.VISIBLE);
-						rightImage
-								.setBackgroundResource(R.drawable.shadow_right);
-						moveImage.setVisibility(View.VISIBLE);
-						floatImage.setVisibility(View.INVISIBLE);
-						xiangjiImage.setVisibility(View.GONE);
-						picFrameImageL.setVisibility(View.VISIBLE);
-						picFrameImageR.setVisibility(View.GONE);
-						flag = 0;
-						can_drag = true;
-						camera.startPreview();
-						noButton.setEnabled(true);
+					leftImage.setVisibility(View.VISIBLE);
+					leftImage.setImageBitmap(targetbm_left);
+					// xiangjiImage.setVisibility(View.VISIBLE);
+					moveImage.setVisibility(View.GONE);
+					picFrameImageL.setVisibility(View.GONE);
+					picFrameImageR.setVisibility(View.VISIBLE);
+					rightImage.setVisibility(View.INVISIBLE);
+					floatImage.setVisibility(View.INVISIBLE);
+					//				rightImage.setBackgroundColor(Color.BLACK);
+					//				rightImage.getBackground().setAlpha(200);
+					//				rightImage.setVisibility(View.VISIBLE);
+					noButton.setVisibility(View.INVISIBLE);
+					floatImage.setVisibility(View.VISIBLE);
+					floatImage.setImageBitmap(targetbm_right);
+					floatImage.setAlpha(99);
+					noButton.setOnClickListener(new OnClickListener() {
+
+						public void onClick(View v) {
+							noButton.setEnabled(false);
+							// TODO Auto-generated method stub
+							leftImage.setVisibility(View.GONE);
+							noButton.setVisibility(View.GONE);
+							rightImage.setVisibility(View.VISIBLE);
+							rightImage
+									.setBackgroundResource(R.drawable.shadow_right);
+							moveImage.setVisibility(View.VISIBLE);
+							floatImage.setVisibility(View.INVISIBLE);
+							xiangjiImage.setVisibility(View.GONE);
+							picFrameImageL.setVisibility(View.VISIBLE);
+							picFrameImageR.setVisibility(View.GONE);
+							flag = 0;
+							can_drag = true;
+							camera.startPreview();
+							noButton.setEnabled(true);
+						}
+					});
+					Camera.Parameters parameters = camera.getParameters();
+					if (parameters.isAutoExposureLockSupported()) {
+						parameters.setAutoExposureLock(true);
 					}
-				});
-				Camera.Parameters parameters = camera.getParameters();
-				if(parameters.isAutoExposureLockSupported())
-				{
-					parameters.setAutoExposureLock(true);
+					camera.stopPreview();
+					camera.startPreview();
+				} else {
+					flag = 0;
+					ImageSize sizes = curWindow.getImageSize("right",
+							pictureSize.width, pictureSize.height);
+					Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
+							sizes.y, sizes.width, sizes.height);
+					FileUtil.memoryOneImage(targetbm_right, "right");
+
+					Intent finalImageIntent = new Intent(
+							HachathonMainActivity.this,
+							HachathonFinalImageActivity.class);
+					finalImageIntent
+							.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+					finalImageIntent.putExtra("HkWindow", curWindow);
+					startActivity(finalImageIntent);
+					camera.release();
+					//HachathonMainActivity.this.finish();
 				}
-				camera.stopPreview();
-				camera.startPreview();
-			} else {
-				flag = 0;
-				ImageSize sizes = curWindow.getImageSize("right",
-						pictureSize.width, pictureSize.height);
-				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
-						sizes.y, sizes.width, sizes.height);
-				FileUtil.memoryOneImage(targetbm_right, "right");
-				
-				Intent finalImageIntent = new Intent(
-						HachathonMainActivity.this,
-						HachathonFinalImageActivity.class);
-				finalImageIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-				finalImageIntent.putExtra("HkWindow", curWindow);
-				startActivity(finalImageIntent);
-				camera.release();
-				//HachathonMainActivity.this.finish();
+			} catch (Exception e) {
+				log_file.saveLog(e, "onPictureTaken");
 			}
 
 		}

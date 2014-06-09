@@ -10,6 +10,7 @@ import com.hackathon.entity.FinalImageWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
 import com.hackathon.view.CropBoxView;
+import com.hackathon.worker.HkExceptionHandler;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -82,6 +83,7 @@ public class HachathonFinalImageActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler()); 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		// requestWindowFeature(Window.FEATURE_PROGRESS);
 		setContentView(R.layout.final_image);
@@ -99,7 +101,6 @@ public class HachathonFinalImageActivity extends Activity {
 		cropBoxView = (CropBoxView) findViewById(R.id.cropBoxView);
 		cropBoxView.setColor(Color.WHITE);
 		cropBoxView.setBorderWidth(10);
-
 		setStatus("fit");
 
 		// paintCropBox();
@@ -413,6 +414,7 @@ public class HachathonFinalImageActivity extends Activity {
 		myImageFinalRight.setDrawingCacheEnabled(false);
 		cropBox.change(size_left.x, size_left.y, size_left.width - MOREPIX
 				+ size_right.width, size_right.height);
+		cropBoxView.setLeftWidth(size_left.width - MOREPIX);
 		// cropBox.change(finalImageWindow.viewX + size_left.x,
 		// finalImageWindow.viewY + size_left.y, size_left.width - MOREPIX,
 		// size_right.height);
@@ -429,6 +431,7 @@ public class HachathonFinalImageActivity extends Activity {
 		// LinearLayout.LayoutParams(cropBox.width, cropBox.height) );
 		cropBoxView.setLayoutParams(new FrameLayout.LayoutParams(cropBox.width,
 				cropBox.height));
+		
 	}
 
 	class ProcessThread extends Thread {

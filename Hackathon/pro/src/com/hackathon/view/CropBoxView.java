@@ -48,8 +48,8 @@ public class CropBoxView  extends ImageView {
         super.onDraw(canvas);  
         // 画边框  
         Rect rec = canvas.getClipBounds();  
-        rec.bottom--;  
-        rec.right--;  
+//        rec.bottom--;  
+//        rec.right--;  
         Paint paint = new Paint();  
         //设置边框颜色  
         paint.setColor(co);  
@@ -62,6 +62,7 @@ public class CropBoxView  extends ImageView {
     
     private void drawSplitLine(Canvas canvas)
     {
+    	invalidate();
     	Paint paint = new Paint();  
     	paint.setColor(Color.RED);
     	paint.setStrokeWidth(5);
