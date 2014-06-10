@@ -20,7 +20,9 @@ import android.util.Log;
 public class FileUtil {
 	private static String TAG = "FileUtil";
 	private static String root_dir = Environment.getExternalStorageDirectory()
-			+ "/high_camera";
+			+ "/cache_heying";
+	private static String final_dir = Environment.getExternalStorageDirectory()
+			+ "/HeyingCamera";
 	private static String schedul_path = "schedul.txt";
 	private static String evn_log_path = "/env.txt";
 	
@@ -45,7 +47,7 @@ public class FileUtil {
 		else if ("final_right_tmp".equals(type))
 			path += "/camera_final_right_tmp.jpg";
 		else if ("final".equals(type))
-			path += "/"+ System.currentTimeMillis()+"final.jpg";
+			return final_dir + "/"+ System.currentTimeMillis()+"final.jpg";
 		else if ("final_record_left".equals(type))
 			path += "/"+ System.currentTimeMillis()+"final_left.jpg";
 		else if ("final_record_right".equals(type))
@@ -60,6 +62,9 @@ public class FileUtil {
 		File dir = new File(root_dir);
 		if (!dir.exists())
 			dir.mkdir();
+		File fdir = new File(final_dir);
+		if (!fdir.exists())
+			fdir.mkdir();
 		File env_log = new File(root_dir + evn_log_path);
 		if(env_log.exists())
 			env_log.delete();

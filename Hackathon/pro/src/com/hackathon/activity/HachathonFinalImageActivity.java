@@ -219,17 +219,9 @@ public class HachathonFinalImageActivity extends Activity {
 				
 				Bitmap final_left = FileUtil.loadBitmapFromFile("final_left");
 				path = FileUtil.memoryOneImage(final_left, "final_record_left");
-				intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
-				uri = Uri.fromFile(new File(path));   
-				intent.setData(uri);     
-				sendBroadcast(intent);
 				
 				Bitmap final_right = FileUtil.loadBitmapFromFile("final_right");
 				FileUtil.memoryOneImage(final_right, "final_record_right");
-				intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
-				uri = Uri.fromFile(new File(path));   
-				intent.setData(uri);     
-				sendBroadcast(intent);
 				
 				startActivity(new Intent(HachathonFinalImageActivity.this,
 						HachathonLastActivity.class));
@@ -549,18 +541,10 @@ public class HachathonFinalImageActivity extends Activity {
 		Bitmap target_left = Bitmap.createBitmap(tmp_left, size_left.x,
 				size_left.y, size_left.width, size_left.height);
 		String path = FileUtil.memoryOneImage(target_left, "final_left");
-		Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
-		Uri uri = Uri.fromFile(new File(path));   
-		intent.setData(uri);     
-		sendBroadcast(intent);
 		
 		Bitmap target_right = Bitmap.createBitmap(tmp_right, size_right.x,
 				size_right.y, size_right.width, size_right.height);
 		path = FileUtil.memoryOneImage(target_right, "final_right");
-		intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
-		uri = Uri.fromFile(new File(path));   
-		intent.setData(uri);     
-		sendBroadcast(intent);
 		myImageFinalRight.setDrawingCacheEnabled(false);
 		myImageFinalDown.setDrawingCacheEnabled(false);
 

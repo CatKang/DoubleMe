@@ -333,18 +333,8 @@ public class HachathonMainActivity extends Activity implements
 						sizes.y, sizes.width, sizes.height);
 
 				String path = FileUtil.memoryOneImage(targetbm_left, "left");
-				Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
-				Uri uri = Uri.fromFile(new File(path));   
-				intent.setData(uri);     
-				sendBroadcast(intent);
 				path = FileUtil.memoryOneImage(targetbm_right, "float");
-				uri = Uri.fromFile(new File(path));   
-				intent.setData(uri);     
-				sendBroadcast(intent);
 				path = FileUtil.memoryOneImage(bm, "whole");
-				uri = Uri.fromFile(new File(path));   
-				intent.setData(uri);     
-				sendBroadcast(intent);
 
 				leftImage.setVisibility(View.VISIBLE);
 				leftImage.setImageBitmap(targetbm_left);
@@ -399,10 +389,7 @@ public class HachathonMainActivity extends Activity implements
 				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
 						sizes.y, sizes.width, sizes.height);
 				String path = FileUtil.memoryOneImage(targetbm_right, "right");
-				Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
-				Uri uri = Uri.fromFile(new File(path));   
-				intent.setData(uri);     
-				sendBroadcast(intent);
+				
 				Intent finalImageIntent = new Intent(
 						HachathonMainActivity.this,
 						HachathonFinalImageActivity.class);
