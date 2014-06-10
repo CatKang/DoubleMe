@@ -12,5 +12,6 @@
     
     <string name="nexttext">第二个人的拍摄位置</string>
     <string name="qrnext">确认后开始拍摄第二个人</string>
-    
+    <string name="finaltext">请移动右侧图片对齐边界</string>
+    <string name="finaltext2">请点击确认按钮保存</string>
 </resources>

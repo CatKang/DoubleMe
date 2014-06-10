@@ -1,5 +1,6 @@
 package com.hackathon.entity;
 
+
 import com.hackathon.main.R.drawable;
 
 import android.graphics.Point;

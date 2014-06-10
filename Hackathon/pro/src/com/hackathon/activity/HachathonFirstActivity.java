@@ -1,8 +1,6 @@
 package com.hackathon.activity;
 
 import com.hackathon.main.R;
-import com.hackathon.main.R.id;
-import com.hackathon.main.R.layout;
 import com.hackathon.worker.HkExceptionHandler;
 
 import android.app.Activity;
@@ -18,13 +16,13 @@ public class HachathonFirstActivity extends Activity
 {
 
 	ImageButton doubleButton;
-	ImageButton threeButton;
+//	ImageButton threeButton;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.first);
 		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler()); 
+		setContentView(R.layout.first);
 		doubleButton = (ImageButton)findViewById(R.id.buttondouble);
 		doubleButton.setOnClickListener(new OnClickListener() {
 			
@@ -36,7 +34,7 @@ public class HachathonFirstActivity extends Activity
 				startActivity(intent);
 			}
 		});
-		threeButton = (ImageButton)findViewById(R.id.buttonthree);
+//		threeButton = (ImageButton)findViewById(R.id.buttonthree);
 	}
 	
 	@Override

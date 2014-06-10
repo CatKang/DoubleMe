@@ -69,7 +69,7 @@
                     android:id="@+id/imageRight"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
- 
+ 					android:alpha="30"
                     android:background="@drawable/shadow_right" />
 
                 <ImageView
@@ -104,20 +104,24 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:background="@drawable/bai"/>
-                
+                <TextView
+		            android:id="@+id/text"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="bottom|center_horizontal"
+			        android:text="@string/nexttext"
+			        android:layout_marginBottom="20dp"
+			        android:textColor="@android:color/darker_gray"/>
             </FrameLayout>
         </LinearLayout>
         <Button
 	        android:id="@+id/takephotoButton"
 	        android:layout_width="70dp"
-	        android:layout_height="70dp"
-	        android:drawableTop="@drawable/photobutton"
+	        android:layout_height="fill_parent"
+	        android:padding="5dp"
+	        android:drawableRight="@drawable/photobutton"
 	        android:background="@android:color/transparent"/>
-        <TextView
-            android:id="@+id/text"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:textColor="@android:color/darker_gray"/>
+        
     </FrameLayout>
 	 
 </LinearLayout>

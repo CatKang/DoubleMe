@@ -2,25 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#666666"
+    android:background="#303030"
     android:orientation="vertical"
     android:id="@+id/outsideLayout" >
-
-    
- 
-    
+<ImageView 
+	        android:id="@+id/homeButton"
+	        android:layout_width="40dp"
+	        android:layout_height="40dp"
+	        android:src="@drawable/home"
+	        android:layout_margin="15dp"/>
   <LinearLayout
         android:id="@+id/hideLayout" 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="50dp"
         android:orientation="horizontal">
         <ImageView 
 	        android:id="@+id/success"
-	        android:layout_width="50dp"
-	        android:layout_height="50dp"
-	        android:src="@drawable/success"/>
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/success"
+	        android:layout_marginRight="20dp"/>
         <TextView 
             android:id="@+id/saveText"
             android:layout_width="wrap_content"
@@ -28,7 +30,7 @@
             android:text="保存成功"
             android:textColor="@android:color/white"
             android:layout_gravity="center"
-            android:textSize="25dp"/>
+            android:textSize="20sp"/>
     </LinearLayout>
     
     <ImageButton
@@ -46,7 +48,7 @@
         android:layout_height="wrap_content"
         android:text="继续拍照"
         android:textColor="@android:color/white"
-        android:textSize="25dp"
+        android:textSize="20sp"
         android:layout_gravity="center"/>
     
     <ImageButton 
@@ -56,7 +58,8 @@
         android:background="@android:color/transparent"
         android:src="@drawable/file_share"
         android:layout_gravity="center"
-        android:layout_marginBottom="40dp"/>
+        android:layout_marginBottom="40dp"
+        android:visibility="gone"/>
     
     
     

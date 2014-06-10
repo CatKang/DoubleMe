@@ -1,18 +1,20 @@
 package com.hackathon.activity;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import com.hackathon.common.util.Log;
+
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -22,19 +24,16 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hackathon.common.util.FileUtil;
 import com.hackathon.common.util.GeometryUtil;
+import com.hackathon.common.util.Log;
 import com.hackathon.entity.HkWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
@@ -57,7 +56,7 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView moveImage;
 	private Button noButton;
 	private Button takephotoButton;
-	
+
 	private ImageView picFrameImageL;
 	private ImageView picFrameImageR;
 
@@ -73,93 +72,92 @@ public class HachathonMainActivity extends Activity implements
 	int lastX, lastY;
 	TextView text;
 	Log log_file = null;
+
 	// for frame drag end
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler()); 
+		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler());
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.main);
+		this.initial();
+		mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
+		frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
+		takephotoButton = (Button) findViewById(R.id.takephotoButton);
+		noButton = (Button) findViewById(R.id.noButton);
+		floatImage = (ImageView) findViewById(R.id.imageFloat);
+		rightImage = (ImageView) findViewById(R.id.imageRight);
+		left = (FrameLayout) findViewById(R.id.left);
+		right = (FrameLayout) findViewById(R.id.right);
+		leftImage = (ImageView) findViewById(R.id.imageLeft);
+		text = (TextView) findViewById(R.id.text);
+		text.setVisibility(View.VISIBLE);
+		xiangjiImage = (ImageView) findViewById(R.id.imageXiangji);
+		moveImage = (ImageView) findViewById(R.id.imageMove);
+		picFrameImageL = (ImageView) findViewById(R.id.picFrameImageL);
+		picFrameImageR = (ImageView) findViewById(R.id.picFrameImageR);
+		picFrameImageL.setVisibility(View.VISIBLE);
+		picFrameImageR.setVisibility(View.GONE);
+		// moveImage.setBackgroundResource(R.drawable.bai);
+		surfaceView = (SurfaceView) this.findViewById(R.id.camera);
+		setStatus("initial");
+		takephotoButton.setOnClickListener(new OnClickListener() {
 
-		try {
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			setContentView(R.layout.main);
-			this.initial();
-			mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
-			frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
-			takephotoButton = (Button) findViewById(R.id.takephotoButton);
-			noButton = (Button) findViewById(R.id.noButton);
-			floatImage = (ImageView) findViewById(R.id.imageFloat);
-			rightImage = (ImageView) findViewById(R.id.imageRight);
-			left = (FrameLayout) findViewById(R.id.left);
-			right = (FrameLayout) findViewById(R.id.right);
-			leftImage = (ImageView) findViewById(R.id.imageLeft);
-			text = (TextView) findViewById(R.id.text);
-			xiangjiImage = (ImageView) findViewById(R.id.imageXiangji);
-			moveImage = (ImageView) findViewById(R.id.imageMove);
-			picFrameImageL = (ImageView) findViewById(R.id.picFrameImageL);
-			picFrameImageR = (ImageView) findViewById(R.id.picFrameImageR);
-			picFrameImageL.setVisibility(View.VISIBLE);
-			picFrameImageR.setVisibility(View.GONE);
-			//		moveImage.setBackgroundResource(R.drawable.bai);
-			surfaceView = (SurfaceView) this.findViewById(R.id.camera);
-			setStatus("initial");
-			takephotoButton.setOnClickListener(new OnClickListener() {
 
-				public void onClick(View v) {
-					takephotoButton.setEnabled(false);
-					// TODO Auto-generated method stub
-					if (flag == 0) {
-						camera.takePicture(shutterCallback, rawCallback,
-								jpegCallback);
-						can_drag = false;
-						//					camera.stopPreview();
-						//					camera.startPreview();
-					} else if (flag == 1) {
-						//					leftImage.setVisibility(View.VISIBLE);
-						//					rightImage.setVisibility(View.INVISIBLE);
-						//					floatImage.setVisibility(View.VISIBLE);
-						//					picFrameImageL.setVisibility(View.GONE);
-						//					picFrameImageR.setVisibility(View.VISIBLE);
+			public void onClick(View v) {
+				takephotoButton.setEnabled(false);
+				// TODO Auto-generated method stub
+				if (flag == 0) {
+					text.setVisibility(View.VISIBLE);
+					camera.takePicture(shutterCallback, rawCallback,
+							jpegCallback);
+					can_drag = false;
+					// camera.stopPreview();
+					// camera.startPreview();
+				} else if (flag == 1) {
+					// leftImage.setVisibility(View.VISIBLE);
+					// rightImage.setVisibility(View.INVISIBLE);
+					// floatImage.setVisibility(View.VISIBLE);
+					// picFrameImageL.setVisibility(View.GONE);
+					// picFrameImageR.setVisibility(View.VISIBLE);
 
-						camera.takePicture(shutterCallback, rawCallback,
-								jpegCallback);
-						Camera.Parameters parameters = camera.getParameters();
-						if (parameters.isAutoExposureLockSupported()) {
-							parameters.setAutoExposureLock(false);
-						}
+					camera.takePicture(shutterCallback, rawCallback,
+							jpegCallback);
+					Camera.Parameters parameters = camera.getParameters();
+					if (parameters.isAutoExposureLockSupported()) {
+						parameters.setAutoExposureLock(false);
 					}
-					//				} else if (flag == 1) {
-					//					noButton.setVisibility(View.INVISIBLE);
-					//					floatImage.setVisibility(View.VISIBLE);
-					//					rightImage.setVisibility(View.INVISIBLE);
-					//					xiangjiImage.setVisibility(View.GONE);
-					//					moveImage.setVisibility(View.GONE);
-					//					leftImage.setVisibility(View.VISIBLE);
-					//					// floatImage.setBackgroundColor(Color.TRANSPARENT);
-					//					camera.stopPreview();
-					//					camera.startPreview();
-					//					picFrameImageL.setVisibility(View.GONE);
-					//					picFrameImageR.setVisibility(View.VISIBLE);
-					//					Camera.Parameters parameters = camera.getParameters();
-					//					if(parameters.isAutoExposureLockSupported())
-					//					{
-					//						parameters.setAutoExposureLock(false);
-					//					}
-					//				} else if (flag == 2) {
-					//					camera.takePicture(shutterCallback, rawCallback,
-					//							jpegCallback);
-					//				}
-					//				flag++;
-					takephotoButton.setEnabled(true);
 				}
-			});
-			surfaceView.setOnTouchListener(this);
-			SurfaceHolder holder = surfaceView.getHolder();
-			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-			holder.addCallback(this);
-		} catch (Exception e) {
-			log_file.saveLog(e, "HachathonMainActivity");
-		}
+				// } else if (flag == 1) {
+				// noButton.setVisibility(View.INVISIBLE);
+				// floatImage.setVisibility(View.VISIBLE);
+				// rightImage.setVisibility(View.INVISIBLE);
+				// xiangjiImage.setVisibility(View.GONE);
+				// moveImage.setVisibility(View.GONE);
+				// leftImage.setVisibility(View.VISIBLE);
+				// // floatImage.setBackgroundColor(Color.TRANSPARENT);
+				// camera.stopPreview();
+				// camera.startPreview();
+				// picFrameImageL.setVisibility(View.GONE);
+				// picFrameImageR.setVisibility(View.VISIBLE);
+				// Camera.Parameters parameters = camera.getParameters();
+				// if(parameters.isAutoExposureLockSupported())
+				// {
+				// parameters.setAutoExposureLock(false);
+				// }
+				// } else if (flag == 2) {
+				// camera.takePicture(shutterCallback, rawCallback,
+				// jpegCallback);
+				// }
+				// flag++;
+				takephotoButton.setEnabled(true);
+			}
+		});
+		surfaceView.setOnTouchListener(this);
+		SurfaceHolder holder = surfaceView.getHolder();
+		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		holder.addCallback(this);
 
 	}
 
@@ -167,28 +165,26 @@ public class HachathonMainActivity extends Activity implements
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			Toast.makeText(this, "后退键", Toast.LENGTH_SHORT).show();
-			switch (flag)
-			{
+			//Toast.makeText(this, "后退键", Toast.LENGTH_SHORT).show();
+			switch (flag) {
 			case 0:
 				HachathonMainActivity.this.finish();
 				break;
 			case 1:
-				//setStatus("initial");
+				// setStatus("initial");
 				finish();
 				break;
 			}
 			return true;
-		} 
+		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
-	private void initial()
-	{
+
+	private void initial() {
 		FileUtil.init_file_env();
 		log_file = new Log();
 	}
-	
+
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 
@@ -213,7 +209,6 @@ public class HachathonMainActivity extends Activity implements
 		super.onWindowFocusChanged(hasFocus);
 	}
 
-
 	private void setStatus(String input) {
 		if ("initial".equals(input)) {
 			flag = 0;
@@ -222,7 +217,7 @@ public class HachathonMainActivity extends Activity implements
 			windowSize_height = getWindowManager().getDefaultDisplay()
 					.getHeight();
 			takephotoButton.setX(windowSize_width - 200);
-			takephotoButton.setY((windowSize_height - 50) / 2 - 50);
+			//takephotoButton.setY((windowSize_height - 50) / 2 - 50);
 
 		}
 	}
@@ -233,7 +228,7 @@ public class HachathonMainActivity extends Activity implements
 
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 自动生成方法存根
-		
+
 		camera = Camera.open();
 		try {
 			camera.setPreviewDisplay(holder);
@@ -248,8 +243,7 @@ public class HachathonMainActivity extends Activity implements
 					s_pictureSize, windowSize_height);
 			if (vet == false) {
 				// TODO exit
-				Toast.makeText(getBaseContext(), "Fatal Error! Exit!", 100)
-						.show();
+				//Toast.makeText(getBaseContext(), "Fatal Error! Exit!", 100).show();
 
 			}
 			FileUtil.recordSupportSize(s_previewSize, s_pictureSize);
@@ -293,11 +287,12 @@ public class HachathonMainActivity extends Activity implements
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		Toast.makeText(getApplicationContext(), "surfaceStop", 100).show();
+		//Toast.makeText(getApplicationContext(), "surfaceStop", 100).show();
 		// TODO 自动生成方法存根
 		if (camera != null) {
-			
+
 			camera.release();
+			camera = null;
 		}
 
 	}
@@ -314,97 +309,113 @@ public class HachathonMainActivity extends Activity implements
 		}
 	};
 
-
 	private PictureCallback jpegCallback = new PictureCallback() {
+
 		public void onPictureTaken(byte[] _data, Camera _camera) {
 			// Toast.makeText(getApplicationContext(), "jepgCallback",
 			// 100).show();
 
-			try {
-				log_file.saveLog("image data_length : " + _data.length);
-				Bitmap bm = BitmapFactory.decodeByteArray(_data, 0,
-						_data.length);
-				//Bitmap bm = BitmapFactory.decodeByteArray(_data, 0,
-				//		_data.length);
-				if (flag == 0) {
-					flag = 1;
+			log_file.saveLog("image data_length : " + _data.length);
+			Bitmap bm = BitmapFactory.decodeByteArray(_data, 0, _data.length);
+			// Bitmap bm = BitmapFactory.decodeByteArray(_data, 0,
+			// _data.length);
+			if (flag == 0) {
+				flag = 1;
 
-					ImageSize sizes = curWindow.getImageSize("left",
-							pictureSize.width, pictureSize.height);
+				ImageSize sizes = curWindow.getImageSize("left",
+						pictureSize.width, pictureSize.height);
 
-					Bitmap targetbm_left = Bitmap.createBitmap(bm, sizes.x,
-							sizes.y, sizes.width, sizes.height);
-					sizes = curWindow.getImageSize("right", pictureSize.width,
-							pictureSize.height);
-					Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
-							sizes.y, sizes.width, sizes.height);
+				Bitmap targetbm_left = Bitmap.createBitmap(bm, sizes.x,
+						sizes.y, sizes.width, sizes.height);
+				sizes = curWindow.getImageSize("right", pictureSize.width,
+						pictureSize.height);
+				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
+						sizes.y, sizes.width, sizes.height);
 
-					FileUtil.memoryOneImage(targetbm_left, "left");
-					FileUtil.memoryOneImage(targetbm_right, "float");
-					FileUtil.memoryOneImage(bm, "whole");
+				String path = FileUtil.memoryOneImage(targetbm_left, "left");
+				Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
+				Uri uri = Uri.fromFile(new File(path));   
+				intent.setData(uri);     
+				sendBroadcast(intent);
+				path = FileUtil.memoryOneImage(targetbm_right, "float");
+				uri = Uri.fromFile(new File(path));   
+				intent.setData(uri);     
+				sendBroadcast(intent);
+				path = FileUtil.memoryOneImage(bm, "whole");
+				uri = Uri.fromFile(new File(path));   
+				intent.setData(uri);     
+				sendBroadcast(intent);
 
-					leftImage.setVisibility(View.VISIBLE);
-					leftImage.setImageBitmap(targetbm_left);
-					// xiangjiImage.setVisibility(View.VISIBLE);
-					moveImage.setVisibility(View.GONE);
-					picFrameImageL.setVisibility(View.GONE);
-					picFrameImageR.setVisibility(View.VISIBLE);
-					rightImage.setVisibility(View.INVISIBLE);
-					floatImage.setVisibility(View.INVISIBLE);
-					//				rightImage.setBackgroundColor(Color.BLACK);
-					//				rightImage.getBackground().setAlpha(200);
-					//				rightImage.setVisibility(View.VISIBLE);
-					noButton.setVisibility(View.INVISIBLE);
-					floatImage.setVisibility(View.VISIBLE);
-					floatImage.setImageBitmap(targetbm_right);
-					floatImage.setAlpha(99);
-					noButton.setOnClickListener(new OnClickListener() {
+				leftImage.setVisibility(View.VISIBLE);
+				leftImage.setImageBitmap(targetbm_left);
+				// xiangjiImage.setVisibility(View.VISIBLE);
+				moveImage.setVisibility(View.GONE);
+				picFrameImageL.setVisibility(View.GONE);
+				picFrameImageR.setVisibility(View.VISIBLE);
+				rightImage.setVisibility(View.INVISIBLE);
+				floatImage.setVisibility(View.INVISIBLE);
+				// rightImage.setBackgroundColor(Color.BLACK);
+				// rightImage.getBackground().setAlpha(200);
+				// rightImage.setVisibility(View.VISIBLE);
+				noButton.setVisibility(View.INVISIBLE);
+				floatImage.setVisibility(View.VISIBLE);
+				floatImage.setImageBitmap(targetbm_right);
+				floatImage.setAlpha(99);
+				noButton.setOnClickListener(new OnClickListener() {
 
-						public void onClick(View v) {
-							noButton.setEnabled(false);
-							// TODO Auto-generated method stub
-							leftImage.setVisibility(View.GONE);
-							noButton.setVisibility(View.GONE);
-							rightImage.setVisibility(View.VISIBLE);
-							rightImage
-									.setBackgroundResource(R.drawable.shadow_right);
-							moveImage.setVisibility(View.VISIBLE);
-							floatImage.setVisibility(View.INVISIBLE);
-							xiangjiImage.setVisibility(View.GONE);
-							picFrameImageL.setVisibility(View.VISIBLE);
-							picFrameImageR.setVisibility(View.GONE);
-							flag = 0;
-							can_drag = true;
-							camera.startPreview();
-							noButton.setEnabled(true);
-						}
-					});
-					Camera.Parameters parameters = camera.getParameters();
-					if (parameters.isAutoExposureLockSupported()) {
-						parameters.setAutoExposureLock(true);
+					public void onClick(View v) {
+						noButton.setEnabled(false);
+						// TODO Auto-generated method stub
+						leftImage.setVisibility(View.GONE);
+						noButton.setVisibility(View.GONE);
+						rightImage.setVisibility(View.VISIBLE);
+						rightImage
+								.setBackgroundResource(R.drawable.shadow_right);
+						moveImage.setVisibility(View.VISIBLE);
+						floatImage.setVisibility(View.INVISIBLE);
+						xiangjiImage.setVisibility(View.GONE);
+						picFrameImageL.setVisibility(View.VISIBLE);
+						picFrameImageR.setVisibility(View.GONE);
+						flag = 0;
+						can_drag = true;
+						camera.startPreview();
+						noButton.setEnabled(true);
 					}
-					camera.stopPreview();
-					camera.startPreview();
-				} else {
-					flag = 0;
-					ImageSize sizes = curWindow.getImageSize("right",
-							pictureSize.width, pictureSize.height);
-					Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
-							sizes.y, sizes.width, sizes.height);
-					FileUtil.memoryOneImage(targetbm_right, "right");
-
-					Intent finalImageIntent = new Intent(
-							HachathonMainActivity.this,
-							HachathonFinalImageActivity.class);
-					finalImageIntent
-							.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-					finalImageIntent.putExtra("HkWindow", curWindow);
-					startActivity(finalImageIntent);
-					camera.release();
-					//HachathonMainActivity.this.finish();
+				});
+				Camera.Parameters parameters = camera.getParameters();
+				if (parameters.isAutoExposureLockSupported()) {
+					parameters.setAutoExposureLock(true);
 				}
-			} catch (Exception e) {
-				log_file.saveLog(e, "onPictureTaken");
+				camera.stopPreview();
+				camera.startPreview();
+				text.setVisibility(View.INVISIBLE);
+//				targetbm_left.recycle();
+//				targetbm_right.recycle();
+//				bm.recycle();
+			} else {
+				flag = 0;
+				ImageSize sizes = curWindow.getImageSize("right",
+						pictureSize.width, pictureSize.height);
+				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
+						sizes.y, sizes.width, sizes.height);
+				String path = FileUtil.memoryOneImage(targetbm_right, "right");
+				Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
+				Uri uri = Uri.fromFile(new File(path));   
+				intent.setData(uri);     
+				sendBroadcast(intent);
+				Intent finalImageIntent = new Intent(
+						HachathonMainActivity.this,
+						HachathonFinalImageActivity.class);
+				finalImageIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+				finalImageIntent.putExtra("HkWindow", curWindow);
+				startActivity(finalImageIntent);
+				if(camera!=null)
+				{
+					camera.release();
+				}
+				// HachathonMainActivity.this.finish();
+//				targetbm_right.recycle();
+//				bm.recycle();
 			}
 
 		}
@@ -443,10 +454,10 @@ public class HachathonMainActivity extends Activity implements
 			curWindow.curFrameX += dx;
 			lastX = cx;
 			lastY = cy;
-//			text.setText("curFrameX:" + curWindow.curFrameX + "   cx:" + cx
-//					+ "  cy:" + cy + "   dx:" + dx + "  paramLeft.width:"
-//					+ paramLeft.width + "   paramRight.width:"
-//					+ paramRight.width);
+			// text.setText("curFrameX:" + curWindow.curFrameX + "   cx:" + cx
+			// + "  cy:" + cy + "   dx:" + dx + "  paramLeft.width:"
+			// + paramLeft.width + "   paramRight.width:"
+			// + paramRight.width);
 			break;
 
 		case MotionEvent.ACTION_UP:

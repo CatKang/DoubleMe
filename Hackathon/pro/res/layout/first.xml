@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?> 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
@@ -9,33 +9,31 @@
     <ImageView
         android:src = "@drawable/appname"
         android:layout_marginTop="50dp"
-        android:layout_marginLeft="50dp"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@android:color/transparent" />
 
     
 
     <ImageButton    
-    android:layout_width="fill_parent"     
-    android:layout_height="80dp"   
-    android:layout_marginTop="70dp" 
-    android:id = "@+id/buttondouble"
-    android:src ="@drawable/buttondouble"
-    android:background="@android:color/transparent"
-    >    
+	    android:layout_width="wrap_content"     
+	    android:layout_height="wrap_content"   
+	    android:layout_centerInParent="true"
+	    android:id = "@+id/buttondouble"
+	    android:src ="@drawable/buttondouble"
+	    android:background="@android:color/transparent"
+	    >    
      </ImageButton> 
-     
-    
-    <ImageButton    
-    android:layout_width="fill_parent" 
-    android:layout_marginTop="15dp"    
-    android:layout_height="80dp"    
-    android:id = "@+id/buttonthree"
-    android:src ="@drawable/buttonthree"
-    android:background="@android:color/transparent"
-    >    
-</ImageButton> 
+     <TextView 
+         android:layout_height="wrap_content"
+         android:layout_width="wrap_content"
+         android:text="点击拍照"
+         android:textColor="@android:color/darker_gray"
+         android:layout_below="@id/buttondouble"
+         android:layout_centerHorizontal="true"
+         android:layout_margin="10dp"
+         android:textSize="15sp"/>
     
 
-</LinearLayout>
+</RelativeLayout>

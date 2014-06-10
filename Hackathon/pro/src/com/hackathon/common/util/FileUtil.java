@@ -73,8 +73,9 @@ public class FileUtil {
 		return load_bitmap;
 	}
 
-	public static void memoryOneImage(Bitmap bitmap, String type) {
-		String path = getFilePathByType(type);
+	public static String memoryOneImage(Bitmap bitmap, String type) {
+		String path = null;
+		path = getFilePathByType(type);
 		File myCaptureFile = new File(path);
 		BufferedOutputStream bos = null;
 		try {
@@ -82,10 +83,13 @@ public class FileUtil {
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
 			bos.flush();
 			bos.close();
+			return path;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			return path;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return path;
 		}
 	}
 

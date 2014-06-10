@@ -1,5 +1,6 @@
 package com.hackathon.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +10,11 @@ import com.hackathon.common.util.GeometryUtil;
 import com.hackathon.entity.FinalImageWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
+import com.hackathon.progressdialog.MyProgressDialog;
+
 import com.hackathon.view.CropBoxView;
 import com.hackathon.worker.HkExceptionHandler;
+
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,6 +24,8 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Bitmap.Config;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,6 +41,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ProgressBar;
 
@@ -49,8 +56,10 @@ public class HachathonFinalImageActivity extends Activity {
 	private FrameLayout myLayoutLeft;
 	private FrameLayout mBottomPhotoFrameLayout;
 	private CropBoxView cropBoxView;
+	
 	private FinalImageWindow finalImageWindow;
 	public ImageSize cropBox;
+	private TextView finaltext;
 
 	private final float MOVEREMAINSCALE = (float) 0.2; // 移动后留在屏幕内部的比例
 	private final float ZOOMINMAXSCALE = (float) 3.0; // 右侧图片放大比例上限
@@ -59,7 +68,8 @@ public class HachathonFinalImageActivity extends Activity {
 	private int MOREPIX = 0; // 左图实际多个的值
 	private final float REMAINSCALE = (float) 0.10; // 右侧边栏的比例
 	private final int MARGIN = 60;
-
+	
+	private MyProgressDialog progressDialog;
 	/* ImageViewRight onTouch */
 	// boolean isFit = false;
 	Matrix matrix = new Matrix();
@@ -83,6 +93,7 @@ public class HachathonFinalImageActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		progressDialog = MyProgressDialog.createDialog(this);
 		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler()); 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		// requestWindowFeature(Window.FEATURE_PROGRESS);
@@ -158,8 +169,8 @@ public class HachathonFinalImageActivity extends Activity {
 				ProcessThread thread = new ProcessThread();
 				thread.start();
 
-				Toast.makeText(getApplicationContext(), "UI finished", 100)
-						.show();
+//				Toast.makeText(getApplicationContext(), "UI finished", 100)
+//						.show();
 				// int cur_phase = 1;
 				// while(cur_phase++<10){
 				// Message msg = new Message();
@@ -200,13 +211,26 @@ public class HachathonFinalImageActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Bitmap final_bitmap = FileUtil.loadBitmapFromFile("final_tmp");
-				FileUtil.memoryOneImage(final_bitmap, "final");
-
+				String path = FileUtil.memoryOneImage(final_bitmap, "final");
+				Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
+				Uri uri = Uri.fromFile(new File(path));   
+				intent.setData(uri);     
+				sendBroadcast(intent);
+				
 				Bitmap final_left = FileUtil.loadBitmapFromFile("final_left");
-				FileUtil.memoryOneImage(final_left, "final_record_left");
+				path = FileUtil.memoryOneImage(final_left, "final_record_left");
+				intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
+				uri = Uri.fromFile(new File(path));   
+				intent.setData(uri);     
+				sendBroadcast(intent);
+				
 				Bitmap final_right = FileUtil.loadBitmapFromFile("final_right");
 				FileUtil.memoryOneImage(final_right, "final_record_right");
-
+				intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
+				uri = Uri.fromFile(new File(path));   
+				intent.setData(uri);     
+				sendBroadcast(intent);
+				
 				startActivity(new Intent(HachathonFinalImageActivity.this,
 						HachathonLastActivity.class));
 			}
@@ -218,6 +242,9 @@ public class HachathonFinalImageActivity extends Activity {
 				setStatus("fit");
 			}
 		});
+		finaltext = (TextView)findViewById(R.id.finaltextview);
+		finaltext.setText(R.string.finaltext);
+		
 	}
 
 	/**
@@ -278,11 +305,12 @@ public class HachathonFinalImageActivity extends Activity {
 		return noError;
 	}
 
+	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			Toast.makeText(this, "后退键", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(this, "后退键", Toast.LENGTH_SHORT).show();
 			switch (status)
 			{
 			case FIT:
@@ -310,6 +338,10 @@ public class HachathonFinalImageActivity extends Activity {
 			status = FIT;
 			myImageFinalRight.setVisibility(View.VISIBLE);
 			myImageFinalDown.setVisibility(View.VISIBLE);
+			if(progressDialog.isShowing())
+			{
+				progressDialog.dismiss();
+			}
 			progressBar.setVisibility(View.INVISIBLE);
 			buttonRightYes.setVisibility(View.VISIBLE);
 			buttonRightNo.setVisibility(View.VISIBLE);
@@ -320,18 +352,30 @@ public class HachathonFinalImageActivity extends Activity {
 
 		} else if ("process".equals(input)) {
 			status = PROCESS;
-			progressBar.setVisibility(View.VISIBLE);
+			progressBar.setVisibility(View.INVISIBLE);
+			if(!progressDialog.isShowing())
+			{
+				progressDialog.show();
+			}
 			buttonRightYes.setVisibility(View.GONE);
 			buttonRightNo.setVisibility(View.GONE);
+			finaltext.setText("");
+			buttonBottomSave.setVisibility(View.INVISIBLE);
+			buttonBottomCancel.setVisibility(View.INVISIBLE);
 			cropBoxView.setVisibility(View.GONE);
 
 		} else if ("save".equals(input)) {
 			status = SAVE;
 			progressBar.setVisibility(View.INVISIBLE);
+			if(progressDialog.isShowing())
+			{
+				progressDialog.dismiss();
+			}
 			myImageFinalRight.setVisibility(View.INVISIBLE);
-			progressBar.setVisibility(View.GONE);
+			cropBoxView.setVisibility(View.GONE);
 			buttonBottomSave.setVisibility(View.VISIBLE);
 			buttonBottomCancel.setVisibility(View.VISIBLE);
+			finaltext.setText(R.string.finaltext2);
 			Bitmap result = FileUtil.loadBitmapFromFile("final_tmp");
 			myImageFinalDown.setImageBitmap(result);
 		}
@@ -421,6 +465,7 @@ public class HachathonFinalImageActivity extends Activity {
 		paintCropBox();
 	}
 
+
 	private void paintCropBox() {
 
 		// Toast.makeText(getApplicationContext(), cropBox.x + "," + cropBox.y +
@@ -461,14 +506,14 @@ public class HachathonFinalImageActivity extends Activity {
 
 			case 0:
 				// begin
-				Toast.makeText(getApplicationContext(), "begin process", 100)
-						.show();
+//				Toast.makeText(getApplicationContext(), "begin process", 100)
+//						.show();
 				// progressBar.setProgress(0);
 				break;
 			case -1:
 				// end
-				Toast.makeText(getApplicationContext(), "end process", 100)
-						.show();
+//				Toast.makeText(getApplicationContext(), "end process", 100)
+//						.show();
 				// 关闭ProgressDialog
 				// progressBar.setProgress(100);
 				setStatus("save");
@@ -476,12 +521,11 @@ public class HachathonFinalImageActivity extends Activity {
 				break;
 
 			default:
-				Toast.makeText(getApplicationContext(), "what : " + msg.what,
-						100).show();
+//				Toast.makeText(getApplicationContext(), "what : " + msg.what,
+//						100).show();
 				// progressBar.setProgress(msg.what * 10);
 				break;
 			}
-
 		}
 	};
 
@@ -504,12 +548,19 @@ public class HachathonFinalImageActivity extends Activity {
 		// generate image
 		Bitmap target_left = Bitmap.createBitmap(tmp_left, size_left.x,
 				size_left.y, size_left.width, size_left.height);
-		FileUtil.memoryOneImage(target_left, "final_left");
-
+		String path = FileUtil.memoryOneImage(target_left, "final_left");
+		Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
+		Uri uri = Uri.fromFile(new File(path));   
+		intent.setData(uri);     
+		sendBroadcast(intent);
+		
 		Bitmap target_right = Bitmap.createBitmap(tmp_right, size_right.x,
 				size_right.y, size_right.width, size_right.height);
-		FileUtil.memoryOneImage(target_right, "final_right");
-
+		path = FileUtil.memoryOneImage(target_right, "final_right");
+		intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
+		uri = Uri.fromFile(new File(path));   
+		intent.setData(uri);     
+		sendBroadcast(intent);
 		myImageFinalRight.setDrawingCacheEnabled(false);
 		myImageFinalDown.setDrawingCacheEnabled(false);
 
