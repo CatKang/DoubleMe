@@ -121,6 +121,10 @@
 	        android:padding="5dp"
 	        android:drawableRight="@drawable/photobutton"
 	        android:background="@android:color/transparent"/>
+        <com.hackathon.view.FocusBoxView
+            android:id="@+id/focusBoxView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"/>
         
     </FrameLayout>
 	 

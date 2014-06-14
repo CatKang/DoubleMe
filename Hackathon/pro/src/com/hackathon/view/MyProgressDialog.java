@@ -13,7 +13,7 @@
 *       1.0.0           2012-4-27         lxd (rohsuton@gmail.com)        Create
 **************************************************************************************/
 	
-package com.hackathon.progressdialog;
+package com.hackathon.view;
 
 import com.hackathon.main.R;
 

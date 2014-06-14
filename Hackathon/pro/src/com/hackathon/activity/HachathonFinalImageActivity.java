@@ -10,9 +10,9 @@ import com.hackathon.common.util.GeometryUtil;
 import com.hackathon.entity.FinalImageWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
-import com.hackathon.progressdialog.MyProgressDialog;
 
 import com.hackathon.view.CropBoxView;
+import com.hackathon.view.MyProgressDialog;
 import com.hackathon.worker.HkExceptionHandler;
 
 
@@ -111,7 +111,6 @@ public class HachathonFinalImageActivity extends Activity {
 		mBottomPhotoFrameLayout = (FrameLayout) findViewById(R.id.mBottomPhotoFrameLayout);
 		cropBoxView = (CropBoxView) findViewById(R.id.cropBoxView);
 		cropBoxView.setColor(Color.WHITE);
-		cropBoxView.setBorderWidth(10);
 		setStatus("fit");
 
 		// paintCropBox();
@@ -459,15 +458,17 @@ public class HachathonFinalImageActivity extends Activity {
 
 
 	private void paintCropBox() {
-
+		//int out_width = cropBoxView.getBorderwidth();
+		int out_width = 0;
 		// Toast.makeText(getApplicationContext(), cropBox.x + "," + cropBox.y +
 		// ", "+ cropBox.width + ", "+ cropBox.height , 500).show();
-		cropBoxView.setX(cropBox.x);
-		cropBoxView.setY(cropBox.y);
+		cropBoxView.setX(cropBox.x - out_width);
+		cropBoxView.setY(cropBox.y - out_width);
 		// cropBoxView.setLayoutParams(new
 		// LinearLayout.LayoutParams(cropBox.width, cropBox.height) );
-		cropBoxView.setLayoutParams(new FrameLayout.LayoutParams(cropBox.width,
-				cropBox.height));
+		cropBoxView.setLayoutParams(new FrameLayout.LayoutParams(cropBox.width + 2 * out_width,
+				cropBox.height + 2 * out_width));
+		cropBoxView.invalidate();
 		
 	}
 

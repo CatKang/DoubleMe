@@ -1,6 +1,5 @@
 package com.hackathon.common.util;
 
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,15 +11,15 @@ import android.os.Environment;
 
 public class Log {
 	private static String root_dir = Environment.getExternalStorageDirectory()
-			+ "/high_camera";
+			+ "/cache_heying";
 	private static String log_path = "/log.txt";
 	private File file = null;
 
-	public Log(){
+	public Log() {
 		this.file = new File(root_dir + log_path);
-		
+
 	}
-	
+
 	public void saveLog(String fileName) {
 		try {
 

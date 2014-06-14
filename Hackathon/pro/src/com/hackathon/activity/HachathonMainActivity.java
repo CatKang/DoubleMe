@@ -2,6 +2,7 @@ package com.hackathon.activity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -10,13 +11,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.hardware.Camera;
+import android.hardware.Camera.Area;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -31,16 +33,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hackathon.common.listener.HKOnGestureListener;
 import com.hackathon.common.util.FileUtil;
 import com.hackathon.common.util.GeometryUtil;
 import com.hackathon.common.util.Log;
 import com.hackathon.entity.HkWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
+import com.hackathon.view.FocusBoxView;
 import com.hackathon.worker.HkExceptionHandler;
 
 public class HachathonMainActivity extends Activity implements
-		SurfaceHolder.Callback, OnTouchListener {
+		SurfaceHolder.Callback,OnTouchListener {
 	private static String TAG = "HMainActivity";
 	private SurfaceView surfaceView;
 	private Camera camera;
@@ -59,7 +63,10 @@ public class HachathonMainActivity extends Activity implements
 
 	private ImageView picFrameImageL;
 	private ImageView picFrameImageR;
-
+	private GestureDetector mGestureDetector;
+	private HKOnGestureListener hKOnGestureListener;
+	private FocusBoxView focusBoxView;
+	
 	HkWindow curWindow;
 	int flag = 0;
 	Size pictureSize;
@@ -101,9 +108,12 @@ public class HachathonMainActivity extends Activity implements
 		picFrameImageR.setVisibility(View.GONE);
 		// moveImage.setBackgroundResource(R.drawable.bai);
 		surfaceView = (SurfaceView) this.findViewById(R.id.camera);
+		focusBoxView = (FocusBoxView) this.findViewById(R.id.focusBoxView);
 		setStatus("initial");
+		
+		
 		takephotoButton.setOnClickListener(new OnClickListener() {
-
+		
 
 			public void onClick(View v) {
 				takephotoButton.setEnabled(false);
@@ -113,6 +123,7 @@ public class HachathonMainActivity extends Activity implements
 					camera.takePicture(shutterCallback, rawCallback,
 							jpegCallback);
 					can_drag = false;
+					
 					// camera.stopPreview();
 					// camera.startPreview();
 				} else if (flag == 1) {
@@ -155,6 +166,7 @@ public class HachathonMainActivity extends Activity implements
 			}
 		});
 		surfaceView.setOnTouchListener(this);
+		//surfaceView.seton
 		SurfaceHolder holder = surfaceView.getHolder();
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		holder.addCallback(this);
@@ -190,6 +202,8 @@ public class HachathonMainActivity extends Activity implements
 
 		GeometryUtil.uniformScale(previewSize, windowSize_width,
 				windowSize_height);
+		
+		
 		surfaceView.setLayoutParams(new FrameLayout.LayoutParams(
 				previewSize.width, previewSize.height));
 		mainLayout.setLayoutParams(new FrameLayout.LayoutParams(
@@ -202,6 +216,11 @@ public class HachathonMainActivity extends Activity implements
 		// FrameLayout.LayoutParams(previewSize.width, previewSize.height));
 		curWindow = new HkWindow(surfaceView, previewSize.width,
 				previewSize.height);
+		//set gesture listener
+		hKOnGestureListener = new HKOnGestureListener(curWindow, camera, focusBoxView, log_file); 		
+		hKOnGestureListener.refreshFocusBox(flag);
+		mGestureDetector = new GestureDetector(this, hKOnGestureListener);
+		
 		left.setLayoutParams(new LinearLayout.LayoutParams(
 				curWindow.viewWidth / 2, curWindow.viewHeight));
 		right.setLayoutParams(new LinearLayout.LayoutParams(
@@ -209,6 +228,8 @@ public class HachathonMainActivity extends Activity implements
 		super.onWindowFocusChanged(hasFocus);
 	}
 
+	
+	
 	private void setStatus(String input) {
 		if ("initial".equals(input)) {
 			flag = 0;
@@ -233,33 +254,17 @@ public class HachathonMainActivity extends Activity implements
 		try {
 			camera.setPreviewDisplay(holder);
 			Camera.Parameters parameters = camera.getParameters();
-			parameters.setPictureFormat(PixelFormat.RGB_565);
-
+			//parameters.setPictureFormat(PixelFormat.);
+			//parameters.getSupportedPictureFormats();
 			List<Camera.Size> s_previewSize = parameters
 					.getSupportedPreviewSizes();
 			List<Camera.Size> s_pictureSize = parameters
 					.getSupportedPictureSizes();
 			boolean vet = setPreveiewAndPictureSize(s_previewSize,
 					s_pictureSize, windowSize_height);
-			if (vet == false) {
-				// TODO exit
-				//Toast.makeText(getBaseContext(), "Fatal Error! Exit!", 100).show();
-
-			}
-			FileUtil.recordSupportSize(s_previewSize, s_pictureSize);
-
-			// previewSize = GeometryUtil.getOptimalSize(
-			// s_previewSize, windowSize_width, windowSize_height);
-			// previewSize.width = 960;
-			// previewSize.height = 720;
-			//
-
-			// pictureSize = GeometryUtil.getOptimalSize(
-			// s_pictureSize, windowSize_width, windowSize_height);
-			// pictureSize.width = 2048;
-			// pictureSize.height = 1536;
-
+			
 			// record env.log
+			FileUtil.recordSupportSize(s_previewSize, s_pictureSize);
 			FileUtil.recordEnv("PreviewSize: (" + previewSize.width + " , "
 					+ previewSize.height + ")");
 			FileUtil.recordEnv("PictureSize: (" + pictureSize.width + " , "
@@ -268,6 +273,7 @@ public class HachathonMainActivity extends Activity implements
 					+ windowSize_height + ")");
 
 			parameters.setPreviewSize(previewSize.width, previewSize.height);
+			
 			try {
 				parameters
 						.setPictureSize(pictureSize.width, pictureSize.height);
@@ -276,11 +282,12 @@ public class HachathonMainActivity extends Activity implements
 				// camera.startPreview();
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				log_file.saveLog(e, "surfaceCreated");
 			}
 		} catch (IOException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			//e.printStackTrace();
+			log_file.saveLog(e, "surfaceCreated");
 		}
 		camera.startPreview();
 
@@ -299,19 +306,21 @@ public class HachathonMainActivity extends Activity implements
 
 	private ShutterCallback shutterCallback = new ShutterCallback() {
 		public void onShutter() {
-
+			//Toast.makeText(getApplicationContext(), "shutterCallback", 100).show();
 		}
 	};
 
 	private PictureCallback rawCallback = new PictureCallback() {
 		public void onPictureTaken(byte[] _data, Camera _camera) {
 			// TODO Handle RAW image data
+			//Toast.makeText(getApplicationContext(), "rawcallback", 100).show();
 		}
 	};
 
 	private PictureCallback jpegCallback = new PictureCallback() {
 
 		public void onPictureTaken(byte[] _data, Camera _camera) {
+			//Toast.makeText(getApplicationContext(), "jpegCallback", 100).show();
 			// Toast.makeText(getApplicationContext(), "jepgCallback",
 			// 100).show();
 
@@ -332,9 +341,9 @@ public class HachathonMainActivity extends Activity implements
 				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
 						sizes.y, sizes.width, sizes.height);
 
-				String path = FileUtil.memoryOneImage(targetbm_left, "left");
-				path = FileUtil.memoryOneImage(targetbm_right, "float");
-				path = FileUtil.memoryOneImage(bm, "whole");
+				FileUtil.memoryOneImage(targetbm_left, "left");
+				FileUtil.memoryOneImage(targetbm_right, "float");
+				FileUtil.memoryOneImage(bm, "whole");
 
 				leftImage.setVisibility(View.VISIBLE);
 				leftImage.setImageBitmap(targetbm_left);
@@ -376,6 +385,7 @@ public class HachathonMainActivity extends Activity implements
 				if (parameters.isAutoExposureLockSupported()) {
 					parameters.setAutoExposureLock(true);
 				}
+				hKOnGestureListener.refreshFocusBox(flag);
 				camera.stopPreview();
 				camera.startPreview();
 				text.setVisibility(View.INVISIBLE);
@@ -409,6 +419,7 @@ public class HachathonMainActivity extends Activity implements
 	};
 
 	public boolean onTouch(View v, MotionEvent event) {
+		mGestureDetector.onTouchEvent(event);
 		if (!can_drag)
 			return false;
 		switch (event.getAction()) {
@@ -439,6 +450,8 @@ public class HachathonMainActivity extends Activity implements
 			paramRight.height = curWindow.viewHeight;
 			right.setLayoutParams(paramRight);
 			curWindow.curFrameX += dx;
+			hKOnGestureListener.refreshFocusBox(flag);
+			
 			lastX = cx;
 			lastY = cy;
 			// text.setText("curFrameX:" + curWindow.curFrameX + "   cx:" + cx
@@ -508,4 +521,11 @@ public class HachathonMainActivity extends Activity implements
 		}
 		return false;
 	}
+
+	
+	
+
+	
+	
+	
 }
