@@ -116,6 +116,8 @@ public class HachathonMainActivity extends Activity implements
 		
 
 			public void onClick(View v) {
+				if (!takephotoButton.isEnabled())
+					return;
 				takephotoButton.setEnabled(false);
 				// TODO Auto-generated method stub
 				if (flag == 0) {
@@ -133,12 +135,15 @@ public class HachathonMainActivity extends Activity implements
 					// picFrameImageL.setVisibility(View.GONE);
 					// picFrameImageR.setVisibility(View.VISIBLE);
 
-					camera.takePicture(shutterCallback, rawCallback,
-							jpegCallback);
+					
 					Camera.Parameters parameters = camera.getParameters();
 					if (parameters.isAutoExposureLockSupported()) {
 						parameters.setAutoExposureLock(false);
+					}else{
+						log_file.saveLog("do not support exposure lock!");
 					}
+					camera.takePicture(shutterCallback, rawCallback,
+							jpegCallback);
 				}
 				// } else if (flag == 1) {
 				// noButton.setVisibility(View.INVISIBLE);
@@ -162,7 +167,7 @@ public class HachathonMainActivity extends Activity implements
 				// jpegCallback);
 				// }
 				// flag++;
-				takephotoButton.setEnabled(true);
+				
 			}
 		});
 		surfaceView.setOnTouchListener(this);
@@ -233,6 +238,7 @@ public class HachathonMainActivity extends Activity implements
 	private void setStatus(String input) {
 		if ("initial".equals(input)) {
 			flag = 0;
+			//takephotoButton.setEnabled(true);
 			windowSize_width = getWindowManager().getDefaultDisplay()
 					.getWidth();
 			windowSize_height = getWindowManager().getDefaultDisplay()
@@ -392,6 +398,7 @@ public class HachathonMainActivity extends Activity implements
 //				targetbm_left.recycle();
 //				targetbm_right.recycle();
 //				bm.recycle();
+				takephotoButton.setEnabled(true);
 			} else {
 				flag = 0;
 				ImageSize sizes = curWindow.getImageSize("right",
@@ -414,11 +421,13 @@ public class HachathonMainActivity extends Activity implements
 //				targetbm_right.recycle();
 //				bm.recycle();
 			}
-
+			
 		}
 	};
 
 	public boolean onTouch(View v, MotionEvent event) {
+		if (mGestureDetector == null)
+			return true;
 		mGestureDetector.onTouchEvent(event);
 		if (!can_drag)
 			return false;

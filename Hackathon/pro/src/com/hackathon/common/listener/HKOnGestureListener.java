@@ -88,8 +88,12 @@ public class HKOnGestureListener extends SimpleOnGestureListener implements Came
                     al.add(area);  
                     try  
                     {  
-                    	   parameters.setMeteringAreas(al);
-                           parameters.setFocusAreas(al);  
+                    	   if (flag == 0)
+                    	   {
+                    		   //只有当flag为0的时候才设置测光
+                    		   parameters.setMeteringAreas(al);
+                    	   }
+                    	   parameters.setFocusAreas(al);  
                            log_file.saveLog("area position: "+ x1 + " , " + y1);
                            camera.setParameters(parameters);  
                             

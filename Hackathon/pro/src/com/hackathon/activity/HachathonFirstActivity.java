@@ -28,10 +28,14 @@ public class HachathonFirstActivity extends Activity
 			
 			@Override
 			public void onClick(View v) {
+				if (!doubleButton.isEnabled())
+					return;
+				doubleButton.setEnabled(false);
 				// TODO Auto-generated method stub
 				Intent intent = new Intent();
 				intent.setClass(HachathonFirstActivity.this,HachathonMainActivity.class);
 				startActivity(intent);
+				doubleButton.setEnabled(true);
 			}
 		});
 //		threeButton = (ImageButton)findViewById(R.id.buttonthree);

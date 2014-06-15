@@ -42,6 +42,8 @@ public class FileUtil {
 			path += "/camera_final_right.jpg";
 		else if ("final_tmp".equals(type))
 			path += "/camera_final_left_Proc.jpg";
+		else if ("final_direct".equals(type))
+			path += "/camera_final_direct.jpg";
 		else if ("final_left_tmp".equals(type))
 			path += "/camera_final_left_tmp.jpg";
 		else if ("final_right_tmp".equals(type))

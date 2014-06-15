@@ -7,6 +7,7 @@ import java.util.List;
 import com.LibSift.namespace.SiftFun;
 import com.hackathon.common.util.FileUtil;
 import com.hackathon.common.util.GeometryUtil;
+import com.hackathon.common.util.Log;
 import com.hackathon.entity.FinalImageWindow;
 import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
@@ -30,7 +31,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -90,6 +90,8 @@ public class HachathonFinalImageActivity extends Activity {
 	static final int PROCESS = 1;
 	static final int SAVE = 2;
 
+	private boolean conjunct_succ = false;
+	private Log log_file = null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -112,7 +114,29 @@ public class HachathonFinalImageActivity extends Activity {
 		cropBoxView = (CropBoxView) findViewById(R.id.cropBoxView);
 		cropBoxView.setColor(Color.WHITE);
 		setStatus("fit");
-
+		
+		myImageFinalDown.setOnTouchListener(new OnTouchListener() {	
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (status != SAVE)
+					return true;
+				Bitmap result = null;
+				switch (event.getAction() & MotionEvent.ACTION_MASK) {
+				case MotionEvent.ACTION_DOWN:
+					if (conjunct_succ)
+						result = FileUtil.loadBitmapFromFile("final_direct");
+					break;
+				case MotionEvent.ACTION_UP:
+					if (conjunct_succ)
+						result = FileUtil.loadBitmapFromFile("final_tmp");
+					break;
+				
+				}
+				if (result != null)
+					myImageFinalDown.setImageBitmap(result);
+				return true;
+			}		
+		});
 		// paintCropBox();
 		myImageFinalRight.setOnTouchListener(new OnTouchListener() {
 			@Override
@@ -158,16 +182,21 @@ public class HachathonFinalImageActivity extends Activity {
 			}
 		});
 
+		
+		
 		buttonRightYes.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (!buttonRightYes.isEnabled())
+					return;
+				buttonRightYes.setEnabled(false);
 				// 切换状态
 				getProcessPicture();
 				setStatus("process");
 
 				ProcessThread thread = new ProcessThread();
 				thread.start();
-
+				buttonRightYes.setEnabled(true);
 //				Toast.makeText(getApplicationContext(), "UI finished", 100)
 //						.show();
 				// int cur_phase = 1;
@@ -199,16 +228,23 @@ public class HachathonFinalImageActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				if (!buttonRightNo.isEnabled())
+					return;
+				buttonRightNo.setEnabled(false);
 				startActivity(new Intent(HachathonFinalImageActivity.this,
 						HachathonMainActivity.class)
 						.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
 				HachathonFinalImageActivity.this.finish();
+				buttonRightNo.setEnabled(true);
 			}
 		});
 
 		buttonBottomSave.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (!buttonBottomSave.isEnabled())
+					return;
+				buttonBottomSave.setEnabled(false);
 				Bitmap final_bitmap = FileUtil.loadBitmapFromFile("final_tmp");
 				String path = FileUtil.memoryOneImage(final_bitmap, "final");
 				Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
@@ -224,13 +260,18 @@ public class HachathonFinalImageActivity extends Activity {
 				
 				startActivity(new Intent(HachathonFinalImageActivity.this,
 						HachathonLastActivity.class));
+				buttonBottomSave.setEnabled(true);
 			}
 		});
 
 		buttonBottomCancel.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (!buttonBottomCancel.isEnabled())
+					return;
+				buttonBottomCancel.setEnabled(false);
 				setStatus("fit");
+				buttonBottomCancel.setEnabled(true);
 			}
 		});
 		finaltext = (TextView)findViewById(R.id.finaltextview);
@@ -252,7 +293,7 @@ public class HachathonFinalImageActivity extends Activity {
 		m.getValues(values);
 		float sx = values[0];
 		float sy = values[4];
-		Log.d("lxy", "scale_X = " + sx + ", scale_Y = " + sy);
+		//Log.d("lxy", "scale_X = " + sx + ", scale_Y = " + sy);
 		int image_dx = (int) values[2];
 		int image_dy = (int) values[5];
 		int image_width = (int) (dw * sx);
@@ -327,6 +368,7 @@ public class HachathonFinalImageActivity extends Activity {
 	private void setStatus(String input) {
 		if ("fit".equals(input)) {
 			status = FIT;
+			log_file = new com.hackathon.common.util.Log();
 			myImageFinalRight.setVisibility(View.VISIBLE);
 			myImageFinalDown.setVisibility(View.VISIBLE);
 			if(progressDialog.isShowing())
@@ -367,7 +409,12 @@ public class HachathonFinalImageActivity extends Activity {
 			buttonBottomSave.setVisibility(View.VISIBLE);
 			buttonBottomCancel.setVisibility(View.VISIBLE);
 			finaltext.setText(R.string.finaltext2);
-			Bitmap result = FileUtil.loadBitmapFromFile("final_tmp");
+			Bitmap result;
+			//Toast.makeText(getApplicationContext(), "succ : " + conjunct_succ, 100).show();
+			if (conjunct_succ)
+				result = FileUtil.loadBitmapFromFile("final_tmp");
+			else
+				result = FileUtil.loadBitmapFromFile("final_direct");
 			myImageFinalDown.setImageBitmap(result);
 		}
 
@@ -570,7 +617,7 @@ public class HachathonFinalImageActivity extends Activity {
 		m.getValues(values);
 		float sx = values[0];
 		float sy = values[4];
-		Log.d("lxy", "scale_X = " + sx + ", scale_Y = " + sy);
+		//Log.d("lxy", "scale_X = " + sx + ", scale_Y = " + sy);
 		int image_dx = (int) values[2];
 		int image_dy = (int) values[5];
 		int image_width = (int) (dw * sx);
@@ -639,7 +686,7 @@ public class HachathonFinalImageActivity extends Activity {
 		Canvas canvas = new Canvas(result);
 		canvas.drawBitmap(tmp_left, new Matrix(), null);
 		canvas.drawBitmap(final_right, tmp_left.getWidth(), 0, null);
-		FileUtil.memoryOneImage(result, "final_tmp");
+		FileUtil.memoryOneImage(result, "final_direct");
 
 		// myImageFinalDown.setImageBitmap(result);
 	}
@@ -650,11 +697,20 @@ public class HachathonFinalImageActivity extends Activity {
 	private void generateFinalImage() {
 		String fileName1 = FileUtil.getFilePathByType("final_left");
 		String fileName2 = FileUtil.getFilePathByType("final_right");
-		int ret = SiftFun.siftConjunction(fileName1, fileName2);
-		// Toast.makeText(getApplicationContext(), "conjunction finished : " +
-		// ret, 100).show();
-		if (ret != 0)
+
+		try {
+			int ret = SiftFun.siftConjunction(fileName1, fileName2);
+			// Toast.makeText(getApplicationContext(), "conjunction finished : "
+			// +
+			// ret, 100).show();
+			if (ret == 0)
+				conjunct_succ = true; 
+			
 			generateFinalImage_directly();
+
+		} catch (Exception e) {
+			log_file.saveLog(e, "generateFinalImage");
+		}
 	}
 
 }
