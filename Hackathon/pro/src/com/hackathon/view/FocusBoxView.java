@@ -1,11 +1,16 @@
 package com.hackathon.view;
 
 import com.hackathon.entity.FinalImageWindow;
+import com.hackathon.main.R;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PathEffect;
 import android.graphics.Point;
@@ -17,7 +22,9 @@ public class FocusBoxView  extends ImageView {
   
     private int co;  
     private int borderwidth = 5;
-   
+    private final Resources res=getResources();
+    private int pic = R.drawable.focus_frame;
+    
 	public FocusBoxView(Context context) {  
         super(context);  
     }  
@@ -38,19 +45,29 @@ public class FocusBoxView  extends ImageView {
           
         borderwidth = width;  
     }  
+    
+    public void focused(boolean isFocus)
+    {
+    	if (isFocus)
+    		pic = R.drawable.focus_image_green;
+    	else
+    		pic = R.drawable.focus_frame;
+    }
     @Override  
     protected void onDraw(Canvas canvas) {  
         super.onDraw(canvas);  
+        Bitmap bmp=BitmapFactory.decodeResource(res, pic);
+        canvas.drawBitmap(bmp, new Matrix(), null);
         
-        Rect rec = canvas.getClipBounds(); 
-      //设置边框颜色  
-        Paint paint = new Paint(); 
-        paint.setColor(co);  
-        paint.setStyle(Paint.Style.STROKE); 
-        
-        //设置边框宽度  
-        paint.setStrokeWidth(borderwidth);     
-        canvas.drawRect(rec, paint);  
+//        Rect rec = canvas.getClipBounds(); 
+//      //设置边框颜色  
+//        Paint paint = new Paint(); 
+//        paint.setColor(co);  
+//        paint.setStyle(Paint.Style.STROKE); 
+//        
+//        //设置边框宽度  
+//        paint.setStrokeWidth(borderwidth);     
+//        canvas.drawRect(rec, paint);  
     }  
     
 }  

@@ -53,11 +53,7 @@
                     android:layout_height="fill_parent"
                     android:background="@drawable/shadow_left"
                     android:layout_gravity="right" />
-                <ImageView 
-                    android:id="@+id/picFrameImageL"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:background="@drawable/bai"/>
+               
             </FrameLayout>
 
             <FrameLayout
@@ -99,11 +95,6 @@
 			        android:layout_gravity="right"
 			        android:background="@drawable/no"
 			        android:visibility="gone"/>
-                <ImageView 
-                    android:id="@+id/picFrameImageR"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:background="@drawable/bai"/>
                 <TextView
 		            android:id="@+id/text"
 			        android:layout_width="wrap_content"
@@ -114,13 +105,20 @@
 			        android:textColor="@android:color/darker_gray"/>
             </FrameLayout>
         </LinearLayout>
+         <ImageView
+                    android:id="@+id/takephotoButtonBG"
+                    android:layout_width="60dp"
+                    android:layout_height="fill_parent"
+                     android:background="@drawable/siderbarbg" 
+                      android:alpha="30"/>
         <Button
 	        android:id="@+id/takephotoButton"
-	        android:layout_width="70dp"
-	        android:layout_height="fill_parent"
+	        android:layout_width="60dp"
+	        android:layout_height="60dp"
+	        android:drawableLeft="@drawable/photobutton"
 	        android:padding="5dp"
-	        android:drawableRight="@drawable/photobutton"
-	        android:background="@android:color/transparent"/>
+	         android:background="@android:color/transparent"
+	        />
         <com.hackathon.view.FocusBoxView
             android:id="@+id/focusBoxView"
             android:layout_width="fill_parent"

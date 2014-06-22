@@ -115,28 +115,28 @@ public class HachathonFinalImageActivity extends Activity {
 		cropBoxView.setColor(Color.WHITE);
 		setStatus("fit");
 		
-		myImageFinalDown.setOnTouchListener(new OnTouchListener() {	
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (status != SAVE)
-					return true;
-				Bitmap result = null;
-				switch (event.getAction() & MotionEvent.ACTION_MASK) {
-				case MotionEvent.ACTION_DOWN:
-					if (conjunct_succ)
-						result = FileUtil.loadBitmapFromFile("final_direct");
-					break;
-				case MotionEvent.ACTION_UP:
-					if (conjunct_succ)
-						result = FileUtil.loadBitmapFromFile("final_tmp");
-					break;
-				
-				}
-				if (result != null)
-					myImageFinalDown.setImageBitmap(result);
-				return true;
-			}		
-		});
+//		myImageFinalDown.setOnTouchListener(new OnTouchListener() {	
+//			@Override
+//			public boolean onTouch(View v, MotionEvent event) {
+//				if (status != SAVE)
+//					return true;
+//				Bitmap result = null;
+//				switch (event.getAction() & MotionEvent.ACTION_MASK) {
+//				case MotionEvent.ACTION_DOWN:
+//					if (conjunct_succ)
+//						result = FileUtil.loadBitmapFromFile("final_direct");
+//					break;
+//				case MotionEvent.ACTION_UP:
+//					if (conjunct_succ)
+//						result = FileUtil.loadBitmapFromFile("final_tmp");
+//					break;
+//				
+//				}
+//				if (result != null)
+//					myImageFinalDown.setImageBitmap(result);
+//				return true;
+//			}		
+//		});
 		// paintCropBox();
 		myImageFinalRight.setOnTouchListener(new OnTouchListener() {
 			@Override
@@ -260,6 +260,7 @@ public class HachathonFinalImageActivity extends Activity {
 				
 				startActivity(new Intent(HachathonFinalImageActivity.this,
 						HachathonLastActivity.class));
+				HachathonFinalImageActivity.this.finish();
 				buttonBottomSave.setEnabled(true);
 			}
 		});

@@ -24,6 +24,9 @@ public class HkWindow implements Serializable{
 	
 	public double onFrameThresholdRadio = 0.03; // 认为在边框上的阈值
 	public double insideThresholdRadio = 0.3; // 认为在边框上的阈值
+	public double siderBarRadio = 0.1;
+	
+	public int siderBarWidth;
 	public int onFrameThreshold; // 认为在边框上的阈值
 	public int insideThreshold; // 认为在边框上的阈值
 	public HkWindow(SurfaceView sview, int view_width, int view_height) {
@@ -46,6 +49,7 @@ public class HkWindow implements Serializable{
 		curFrameYMax = viewY + viewHeight;
 		curFrameXMin = viewX + insideThreshold;
 		curFrameXMax = viewX + (viewWidth - insideThreshold);
+		siderBarWidth = (int)(viewWidth * siderBarRadio);
 	}
 
 	public boolean onFrame(int curX, int curY) {

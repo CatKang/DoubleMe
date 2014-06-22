@@ -33,7 +33,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.hackathon.common.listener.HKOnGestureListener;
+import com.hackathon.common.listener.TouchFocusListener;
 import com.hackathon.common.util.FileUtil;
 import com.hackathon.common.util.GeometryUtil;
 import com.hackathon.common.util.Log;
@@ -60,11 +60,8 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView moveImage;
 	private Button noButton;
 	private Button takephotoButton;
-
-	private ImageView picFrameImageL;
-	private ImageView picFrameImageR;
-	private GestureDetector mGestureDetector;
-	private HKOnGestureListener hKOnGestureListener;
+	private ImageView takephotoButtonBG;
+	private TouchFocusListener touchFocusListener;
 	private FocusBoxView focusBoxView;
 	
 	HkWindow curWindow;
@@ -73,14 +70,14 @@ public class HachathonMainActivity extends Activity implements
 	Size previewSize;
 	int windowSize_width;
 	int windowSize_height;
-
+	
 	// for frame drag
 	boolean isSetFrame = false, can_drag = true;
 	int lastX, lastY;
 	TextView text;
-	Log log_file = null;
-
 	// for frame drag end
+	Log log_file = null;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +89,7 @@ public class HachathonMainActivity extends Activity implements
 		mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
 		frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
 		takephotoButton = (Button) findViewById(R.id.takephotoButton);
+		takephotoButtonBG = (ImageView) findViewById(R.id.takephotoButtonBG);
 		noButton = (Button) findViewById(R.id.noButton);
 		floatImage = (ImageView) findViewById(R.id.imageFloat);
 		rightImage = (ImageView) findViewById(R.id.imageRight);
@@ -102,10 +100,10 @@ public class HachathonMainActivity extends Activity implements
 		text.setVisibility(View.VISIBLE);
 		xiangjiImage = (ImageView) findViewById(R.id.imageXiangji);
 		moveImage = (ImageView) findViewById(R.id.imageMove);
-		picFrameImageL = (ImageView) findViewById(R.id.picFrameImageL);
-		picFrameImageR = (ImageView) findViewById(R.id.picFrameImageR);
-		picFrameImageL.setVisibility(View.VISIBLE);
-		picFrameImageR.setVisibility(View.GONE);
+		//picFrameImageL = (ImageView) findViewById(R.id.picFrameImageL);
+		//picFrameImageR = (ImageView) findViewById(R.id.picFrameImageR);
+		//picFrameImageL.setVisibility(View.VISIBLE);
+		//picFrameImageR.setVisibility(View.GONE);
 		// moveImage.setBackgroundResource(R.drawable.bai);
 		surfaceView = (SurfaceView) this.findViewById(R.id.camera);
 		focusBoxView = (FocusBoxView) this.findViewById(R.id.focusBoxView);
@@ -138,7 +136,7 @@ public class HachathonMainActivity extends Activity implements
 					
 					Camera.Parameters parameters = camera.getParameters();
 					if (parameters.isAutoExposureLockSupported()) {
-						parameters.setAutoExposureLock(false);
+						parameters.setAutoExposureLock(true);
 					}else{
 						log_file.saveLog("do not support exposure lock!");
 					}
@@ -204,32 +202,36 @@ public class HachathonMainActivity extends Activity implements
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-
+		//设置外边框
 		GeometryUtil.uniformScale(previewSize, windowSize_width,
 				windowSize_height);
-		
-		
 		surfaceView.setLayoutParams(new FrameLayout.LayoutParams(
 				previewSize.width, previewSize.height));
 		mainLayout.setLayoutParams(new FrameLayout.LayoutParams(
 				previewSize.width, previewSize.height));
-		// Toast.makeText(getApplicationContext(), previewSize.width + ", " +
-		// previewSize.height, 100).show();
-		// surfaceView.setLayoutParams(new
-		// FrameLayout.LayoutParams(previewSize.width, previewSize.height));
-		// mainLayout.setLayoutParams(new
-		// FrameLayout.LayoutParams(previewSize.width, previewSize.height));
 		curWindow = new HkWindow(surfaceView, previewSize.width,
 				previewSize.height);
-		//set gesture listener
-		hKOnGestureListener = new HKOnGestureListener(curWindow, camera, focusBoxView, log_file); 		
-		hKOnGestureListener.refreshFocusBox(flag);
-		mGestureDetector = new GestureDetector(this, hKOnGestureListener);
 		
+		//设置对焦框
+		touchFocusListener = new TouchFocusListener(curWindow, camera, focusBoxView, log_file); 		
+		touchFocusListener.refreshFocusBox(flag);
+		
+		//设置左右图框
 		left.setLayoutParams(new LinearLayout.LayoutParams(
 				curWindow.viewWidth / 2, curWindow.viewHeight));
 		right.setLayoutParams(new LinearLayout.LayoutParams(
 				curWindow.viewWidth / 2, curWindow.viewHeight));
+		
+		//设置照相按钮
+		int siderbar_width = curWindow.siderBarWidth;
+		takephotoButton.setLayoutParams(new FrameLayout.LayoutParams(
+				siderbar_width, siderbar_width));
+		takephotoButtonBG.setLayoutParams(new FrameLayout.LayoutParams(
+				siderbar_width, previewSize.height));
+		takephotoButton.setX(previewSize.width - siderbar_width);
+		takephotoButton.setY(previewSize.height / 2 - siderbar_width / 2);
+		takephotoButtonBG.setX(previewSize.width -siderbar_width);
+		
 		super.onWindowFocusChanged(hasFocus);
 	}
 
@@ -243,7 +245,6 @@ public class HachathonMainActivity extends Activity implements
 					.getWidth();
 			windowSize_height = getWindowManager().getDefaultDisplay()
 					.getHeight();
-			takephotoButton.setX(windowSize_width - 200);
 			//takephotoButton.setY((windowSize_height - 50) / 2 - 50);
 
 		}
@@ -355,8 +356,8 @@ public class HachathonMainActivity extends Activity implements
 				leftImage.setImageBitmap(targetbm_left);
 				// xiangjiImage.setVisibility(View.VISIBLE);
 				moveImage.setVisibility(View.GONE);
-				picFrameImageL.setVisibility(View.GONE);
-				picFrameImageR.setVisibility(View.VISIBLE);
+				//picFrameImageL.setVisibility(View.GONE);
+				//picFrameImageR.setVisibility(View.VISIBLE);
 				rightImage.setVisibility(View.INVISIBLE);
 				floatImage.setVisibility(View.INVISIBLE);
 				// rightImage.setBackgroundColor(Color.BLACK);
@@ -379,8 +380,8 @@ public class HachathonMainActivity extends Activity implements
 						moveImage.setVisibility(View.VISIBLE);
 						floatImage.setVisibility(View.INVISIBLE);
 						xiangjiImage.setVisibility(View.GONE);
-						picFrameImageL.setVisibility(View.VISIBLE);
-						picFrameImageR.setVisibility(View.GONE);
+						//picFrameImageL.setVisibility(View.VISIBLE);
+						//picFrameImageR.setVisibility(View.GONE);
 						flag = 0;
 						can_drag = true;
 						camera.startPreview();
@@ -389,9 +390,9 @@ public class HachathonMainActivity extends Activity implements
 				});
 				Camera.Parameters parameters = camera.getParameters();
 				if (parameters.isAutoExposureLockSupported()) {
-					parameters.setAutoExposureLock(true);
+					parameters.setAutoExposureLock(false);
 				}
-				hKOnGestureListener.refreshFocusBox(flag);
+				touchFocusListener.refreshFocusBox(flag);
 				camera.stopPreview();
 				camera.startPreview();
 				text.setVisibility(View.INVISIBLE);
@@ -426,13 +427,16 @@ public class HachathonMainActivity extends Activity implements
 	};
 
 	public boolean onTouch(View v, MotionEvent event) {
-		if (mGestureDetector == null)
-			return true;
-		mGestureDetector.onTouchEvent(event);
+//		if (mGestureDetector == null)
+//			return true;
+//		mGestureDetector.onTouchEvent(event);
+		if (MotionEvent.ACTION_DOWN == event.getAction())
+			touchFocusListener.onTouch(v, event);
+		
 		if (!can_drag)
 			return false;
 		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_DOWN:		
 			lastX = (int) event.getRawX();
 			lastY = (int) event.getRawY();
 			if (curWindow.onFrame(lastX, lastY))
@@ -459,7 +463,8 @@ public class HachathonMainActivity extends Activity implements
 			paramRight.height = curWindow.viewHeight;
 			right.setLayoutParams(paramRight);
 			curWindow.curFrameX += dx;
-			hKOnGestureListener.refreshFocusBox(flag);
+			if (Math.abs(dx) > 10)
+				touchFocusListener.refreshFocusBox(flag);
 			
 			lastX = cx;
 			lastY = cy;
