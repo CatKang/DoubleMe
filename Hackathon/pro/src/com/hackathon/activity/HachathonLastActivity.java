@@ -91,10 +91,19 @@ public class HachathonLastActivity extends Activity {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		
 		// TODO Auto-generated method stub
-		HachathonLastActivity.this.finish();
-		startActivity(new Intent(HachathonLastActivity.this,HachathonFirstActivity.class));
-		return true;
+				if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+					HachathonLastActivity.this.finish();
+					startActivity(new Intent(HachathonLastActivity.this,HachathonFirstActivity.class));
+					return true;
+				}else if (keyCode == KeyEvent.KEYCODE_HOME)
+				{
+					moveTaskToBack(true);  
+		            return true;  
+				}
+				return super.onKeyDown(keyCode, event);
 	}
 	
 	

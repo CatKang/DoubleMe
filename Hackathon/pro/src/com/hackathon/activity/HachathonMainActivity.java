@@ -32,6 +32,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hackathon.common.listener.TouchFocusListener;
 import com.hackathon.common.util.FileUtil;
@@ -134,12 +135,13 @@ public class HachathonMainActivity extends Activity implements
 					// picFrameImageR.setVisibility(View.VISIBLE);
 
 					
-					Camera.Parameters parameters = camera.getParameters();
-					if (parameters.isAutoExposureLockSupported()) {
-						parameters.setAutoExposureLock(true);
-					}else{
-						log_file.saveLog("do not support exposure lock!");
-					}
+//					Camera.Parameters parameters = camera.getParameters();
+//					if (parameters.isAutoExposureLockSupported()) {
+//						
+//						//parameters.setAutoExposureLock(false);
+//					}else{
+//						log_file.saveLog("do not support exposure lock!");
+//					}
 					camera.takePicture(shutterCallback, rawCallback,
 							jpegCallback);
 				}
@@ -191,6 +193,10 @@ public class HachathonMainActivity extends Activity implements
 				break;
 			}
 			return true;
+		}else if (keyCode == KeyEvent.KEYCODE_HOME)
+		{
+			moveTaskToBack(true);  
+            return true;  
 		}
 		return super.onKeyDown(keyCode, event);
 	}
@@ -390,7 +396,9 @@ public class HachathonMainActivity extends Activity implements
 				});
 				Camera.Parameters parameters = camera.getParameters();
 				if (parameters.isAutoExposureLockSupported()) {
-					parameters.setAutoExposureLock(false);
+					//Toast.makeText(getApplicationContext(), "support expoure lock", 100).show();
+					parameters.setAutoExposureLock(true);
+					camera.setParameters(parameters);
 				}
 				touchFocusListener.refreshFocusBox(flag);
 				camera.stopPreview();
@@ -418,7 +426,7 @@ public class HachathonMainActivity extends Activity implements
 				{
 					camera.release();
 				}
-				// HachathonMainActivity.this.finish();
+				HachathonMainActivity.this.finish();
 //				targetbm_right.recycle();
 //				bm.recycle();
 			}
@@ -463,7 +471,7 @@ public class HachathonMainActivity extends Activity implements
 			paramRight.height = curWindow.viewHeight;
 			right.setLayoutParams(paramRight);
 			curWindow.curFrameX += dx;
-			if (Math.abs(dx) > 10)
+			if (Math.abs(dx) > 20)
 				touchFocusListener.refreshFocusBox(flag);
 			
 			lastX = cx;

@@ -58,7 +58,7 @@ public class HachathonFinalImageActivity extends Activity {
 	private CropBoxView cropBoxView;
 	
 	private FinalImageWindow finalImageWindow;
-	public ImageSize cropBox;
+	public ImageSize cropBox = null;
 	private TextView finaltext;
 
 	private final float MOVEREMAINSCALE = (float) 0.2; // 移动后留在屏幕内部的比例
@@ -90,7 +90,7 @@ public class HachathonFinalImageActivity extends Activity {
 	static final int PROCESS = 1;
 	static final int SAVE = 2;
 
-	private boolean conjunct_succ = false;
+	private int conjunct_succ_ret = -1;
 	private Log log_file = null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +113,8 @@ public class HachathonFinalImageActivity extends Activity {
 		mBottomPhotoFrameLayout = (FrameLayout) findViewById(R.id.mBottomPhotoFrameLayout);
 		cropBoxView = (CropBoxView) findViewById(R.id.cropBoxView);
 		cropBoxView.setColor(Color.WHITE);
+		finaltext = (TextView)findViewById(R.id.finaltextview);
+		
 		setStatus("fit");
 		
 //		myImageFinalDown.setOnTouchListener(new OnTouchListener() {	
@@ -235,7 +237,6 @@ public class HachathonFinalImageActivity extends Activity {
 						HachathonMainActivity.class)
 						.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
 				HachathonFinalImageActivity.this.finish();
-				buttonRightNo.setEnabled(true);
 			}
 		});
 
@@ -275,8 +276,7 @@ public class HachathonFinalImageActivity extends Activity {
 				buttonBottomCancel.setEnabled(true);
 			}
 		});
-		finaltext = (TextView)findViewById(R.id.finaltextview);
-		finaltext.setText(R.string.finaltext);
+		
 		
 	}
 
@@ -356,7 +356,11 @@ public class HachathonFinalImageActivity extends Activity {
 				break;
 			}
 			return true;
-		} 
+		}else if (keyCode == KeyEvent.KEYCODE_HOME)
+		{
+			moveTaskToBack(true);  
+            return true;  
+		}
 		return super.onKeyDown(keyCode, event);
 	}
 
@@ -382,6 +386,7 @@ public class HachathonFinalImageActivity extends Activity {
 			buttonBottomSave.setVisibility(View.GONE);
 			buttonBottomCancel.setVisibility(View.GONE);
 			cropBoxView.setVisibility(View.VISIBLE);
+			finaltext.setText(R.string.finaltext);
 			paintFinalImageView();
 
 		} else if ("process".equals(input)) {
@@ -412,10 +417,18 @@ public class HachathonFinalImageActivity extends Activity {
 			finaltext.setText(R.string.finaltext2);
 			Bitmap result;
 			//Toast.makeText(getApplicationContext(), "succ : " + conjunct_succ, 100).show();
-			if (conjunct_succ)
+			if (conjunct_succ_ret == 0)
+			{
+				Toast.makeText(HachathonFinalImageActivity.this, "拼接成功", 100).show();
 				result = FileUtil.loadBitmapFromFile("final_tmp");
+				log_file.saveLog("SUCCESS when conjuction: " + conjunct_succ_ret);
+			}
 			else
+			{
+				Toast.makeText(HachathonFinalImageActivity.this, "拼接似乎不太顺利", 100).show();
 				result = FileUtil.loadBitmapFromFile("final_direct");
+				log_file.saveLog("FAILED when conjuction: " + conjunct_succ_ret);
+			}
 			myImageFinalDown.setImageBitmap(result);
 		}
 
@@ -456,7 +469,8 @@ public class HachathonFinalImageActivity extends Activity {
 		finalImageWindow = new FinalImageWindow(view_width, view_height);
 		finalImageWindow.leftWidth = left_view_width;
 		cropBoxView.setLeftWidth(left_view_width);
-		cropBox = new ImageSize(0, 0, view_width, view_height);
+		if (cropBox == null)
+			cropBox = new ImageSize(0, 0, view_width, view_height);
 
 		// get image
 		Matrix right_matrix = new Matrix();
@@ -700,13 +714,11 @@ public class HachathonFinalImageActivity extends Activity {
 		String fileName2 = FileUtil.getFilePathByType("final_right");
 
 		try {
-			int ret = SiftFun.siftConjunction(fileName1, fileName2);
+			conjunct_succ_ret = SiftFun.siftConjunction(fileName1, fileName2);
 			// Toast.makeText(getApplicationContext(), "conjunction finished : "
 			// +
 			// ret, 100).show();
-			if (ret == 0)
-				conjunct_succ = true; 
-			
+		
 			generateFinalImage_directly();
 
 		} catch (Exception e) {
