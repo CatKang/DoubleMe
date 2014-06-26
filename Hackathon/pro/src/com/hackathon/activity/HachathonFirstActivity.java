@@ -9,6 +9,7 @@ import com.hackathon.worker.HkExceptionHandler;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,21 +30,31 @@ public class HachathonFirstActivity extends Activity
 		super.onCreate(savedInstanceState);
 		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler()); 
 		setContentView(R.layout.first);
-		doubleButton = (ImageButton)findViewById(R.id.buttondouble);
-		doubleButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if (!doubleButton.isEnabled())
-					return;
-				doubleButton.setEnabled(false);
-				// TODO Auto-generated method stub
-				Intent intent = new Intent();
-				intent.setClass(HachathonFirstActivity.this,HachathonMainActivity.class);
-				startActivity(intent);
-				doubleButton.setEnabled(true);
+		new Handler().postDelayed(new Runnable() {
+			public void run() {
+					Intent intent = new Intent();
+					//intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					intent.setClass(HachathonFirstActivity.this,
+							HachathonMainActivity.class);
+					startActivity(intent);
+//				}
 			}
-		});
+		}, 1000);
+//		doubleButton = (ImageButton)findViewById(R.id.buttondouble);
+//		doubleButton.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				if (!doubleButton.isEnabled())
+//					return;
+//				doubleButton.setEnabled(false);
+//				// TODO Auto-generated method stub
+//				Intent intent = new Intent();
+//				intent.setClass(HachathonFirstActivity.this,HachathonMainActivity.class);
+//				startActivity(intent);
+//				doubleButton.setEnabled(true);
+//			}
+//		});
 //		threeButton = (ImageButton)findViewById(R.id.buttonthree);
 		
 

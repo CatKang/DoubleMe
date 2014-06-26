@@ -70,6 +70,7 @@ public class FileUtil {
 		File env_log = new File(root_dir + evn_log_path);
 		if(env_log.exists())
 			env_log.delete();
+		clearCache();
 	}
 
 	public static Bitmap loadBitmapFromFile(String type) {
@@ -115,7 +116,10 @@ public class FileUtil {
 		File oldFile[] = delfolder.listFiles();
 		try {
 			for (int i = 0; i < oldFile.length; i++) {
-				oldFile[i].delete();
+				String fineName = oldFile[i].getName();
+				String fileType = fineName.substring(fineName.lastIndexOf(".")+1, fineName.length());
+				if ("jpg".equals(fileType))
+					oldFile[i].delete();
 			}
 		} catch (Exception e) {
 			System.out.println("清空文件夹操作出错!");

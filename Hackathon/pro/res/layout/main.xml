@@ -109,7 +109,7 @@
                     android:id="@+id/takephotoButtonBG"
                     android:layout_width="60dp"
                     android:layout_height="fill_parent"
-                     android:background="@drawable/siderbarbg" 
+                     
                       android:alpha="30"/>
         <Button
 	        android:id="@+id/takephotoButton"

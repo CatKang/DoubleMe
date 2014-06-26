@@ -24,8 +24,8 @@ public class TouchFocusListener implements OnTouchListener, Camera.AutoFocusCall
 	private FocusBoxView focusBoxView;
 	private Log log_file;
 	private int flag = 0;
-	private final float focusBoxLengthRadio = (float)0.1;
-	private int halfBoxSize;
+	//private final float focusBoxLengthRadio = (float)0.1;
+	private int halfBoxSize = 60;
 
 	public TouchFocusListener(HkWindow curWindow, Camera came, FocusBoxView fbView, Log file)
 	{
@@ -33,7 +33,7 @@ public class TouchFocusListener implements OnTouchListener, Camera.AutoFocusCall
 		focusBoxView = fbView;
 		camera = came;
 		log_file = file;
-		halfBoxSize = (int)(mainWindow.viewHeight * focusBoxLengthRadio);
+		//halfBoxSize = (int)(mainWindow.viewHeight * focusBoxLengthRadio);
 	}
 	
 	public void refreshFocusBox(int flag)
@@ -53,7 +53,8 @@ public class TouchFocusListener implements OnTouchListener, Camera.AutoFocusCall
 			return false;
 		if ((int)fy < mainWindow.viewY + halfBoxSize || (int)fy > mainWindow.viewY + mainWindow.viewHeight - halfBoxSize)
 			return false;
-		if ((int)fx < mainWindow.viewX + halfBoxSize || (int)fx > mainWindow.viewX + mainWindow.viewWidth - mainWindow.siderBarWidth - halfBoxSize)
+		//if ((int)fx < mainWindow.viewX + halfBoxSize || (int)fx > mainWindow.viewX + mainWindow.viewWidth - mainWindow.siderBarWidth - halfBoxSize)
+		if ((int)fx < mainWindow.viewX + halfBoxSize || (int)fx > mainWindow.viewX + mainWindow.viewWidth  - halfBoxSize)
 			return false;
 		return true;
 	}

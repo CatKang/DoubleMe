@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 import android.app.Activity;
@@ -18,6 +20,7 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -79,6 +82,7 @@ public class HachathonMainActivity extends Activity implements
 	// for frame drag end
 	Log log_file = null;
 	
+	int exitTime = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +112,7 @@ public class HachathonMainActivity extends Activity implements
 		// moveImage.setBackgroundResource(R.drawable.bai);
 		surfaceView = (SurfaceView) this.findViewById(R.id.camera);
 		focusBoxView = (FocusBoxView) this.findViewById(R.id.focusBoxView);
-		setStatus("initial");
+		
 		
 		
 		takephotoButton.setOnClickListener(new OnClickListener() {
@@ -185,11 +189,29 @@ public class HachathonMainActivity extends Activity implements
 			//Toast.makeText(this, "后退键", Toast.LENGTH_SHORT).show();
 			switch (flag) {
 			case 0:
-				HachathonMainActivity.this.finish();
-				break;
+				if (exitTime == 0)
+				{
+					Toast.makeText(getApplicationContext(), "再按一次退出程序", 30).show();
+					exitTime = 1;
+					Timer mTimer = new Timer();
+					mTimer.schedule(new TimerTask() {              
+					            public void run() {  
+					            	 Looper.prepare();
+					            	if (exitTime == 1)
+					            		exitTime = 0;    
+					                 Looper.loop();
+
+					            }   
+					        }, 2000);   
+				}
+				else
+				{
+					HachathonMainActivity.this.finish();
+				}	
+				return true;
 			case 1:
-				// setStatus("initial");
-				finish();
+				setStatus("initial");
+				//finish();
 				break;
 			}
 			return true;
@@ -208,36 +230,8 @@ public class HachathonMainActivity extends Activity implements
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		//设置外边框
-		GeometryUtil.uniformScale(previewSize, windowSize_width,
-				windowSize_height);
-		surfaceView.setLayoutParams(new FrameLayout.LayoutParams(
-				previewSize.width, previewSize.height));
-		mainLayout.setLayoutParams(new FrameLayout.LayoutParams(
-				previewSize.width, previewSize.height));
-		curWindow = new HkWindow(surfaceView, previewSize.width,
-				previewSize.height);
 		
-		//设置对焦框
-		touchFocusListener = new TouchFocusListener(curWindow, camera, focusBoxView, log_file); 		
-		touchFocusListener.refreshFocusBox(flag);
-		
-		//设置左右图框
-		left.setLayoutParams(new LinearLayout.LayoutParams(
-				curWindow.viewWidth / 2, curWindow.viewHeight));
-		right.setLayoutParams(new LinearLayout.LayoutParams(
-				curWindow.viewWidth / 2, curWindow.viewHeight));
-		
-		//设置照相按钮
-		int siderbar_width = curWindow.siderBarWidth;
-		takephotoButton.setLayoutParams(new FrameLayout.LayoutParams(
-				siderbar_width, siderbar_width));
-		takephotoButtonBG.setLayoutParams(new FrameLayout.LayoutParams(
-				siderbar_width, previewSize.height));
-		takephotoButton.setX(previewSize.width - siderbar_width);
-		takephotoButton.setY(previewSize.height / 2 - siderbar_width / 2);
-		takephotoButtonBG.setX(previewSize.width -siderbar_width);
-		
+		setStatus("initial");
 		super.onWindowFocusChanged(hasFocus);
 	}
 
@@ -252,7 +246,49 @@ public class HachathonMainActivity extends Activity implements
 			windowSize_height = getWindowManager().getDefaultDisplay()
 					.getHeight();
 			//takephotoButton.setY((windowSize_height - 50) / 2 - 50);
-
+			//设置外边框
+			GeometryUtil.uniformScale(previewSize, windowSize_width,
+					windowSize_height);
+			surfaceView.setLayoutParams(new FrameLayout.LayoutParams(
+					previewSize.width, previewSize.height));
+			mainLayout.setLayoutParams(new FrameLayout.LayoutParams(
+					previewSize.width, previewSize.height));
+			curWindow = new HkWindow(surfaceView, previewSize.width,
+					previewSize.height);
+			
+			//设置对焦框
+			touchFocusListener = new TouchFocusListener(curWindow, camera, focusBoxView, log_file); 		
+			touchFocusListener.refreshFocusBox(flag);
+			
+			//设置左右图框
+			left.setLayoutParams(new LinearLayout.LayoutParams(
+					curWindow.viewWidth / 2, curWindow.viewHeight));
+			right.setLayoutParams(new LinearLayout.LayoutParams(
+					curWindow.viewWidth / 2, curWindow.viewHeight));
+			
+			//设置照相按钮
+			int siderbar_width = curWindow.siderBarWidth;
+			takephotoButton.setLayoutParams(new FrameLayout.LayoutParams(
+					siderbar_width, siderbar_width));
+			takephotoButtonBG.setLayoutParams(new FrameLayout.LayoutParams(
+					siderbar_width, previewSize.height));
+			takephotoButton.setX(previewSize.width - siderbar_width);
+			takephotoButton.setY(previewSize.height / 2 - siderbar_width / 2);
+			takephotoButtonBG.setX(previewSize.width -siderbar_width);
+			
+			//设置显示图层
+			leftImage.setVisibility(View.GONE);
+			rightImage.setVisibility(View.VISIBLE);
+			rightImage
+					.setBackgroundResource(R.drawable.shadow_right);
+			moveImage.setVisibility(View.VISIBLE);
+			floatImage.setVisibility(View.INVISIBLE);
+			//xiangjiImage.setVisibility(View.GONE);
+			//picFrameImageL.setVisibility(View.VISIBLE);
+			//picFrameImageR.setVisibility(View.GONE);
+			can_drag = true;
+			//camera.startPreview();
+			
 		}
 	}
 

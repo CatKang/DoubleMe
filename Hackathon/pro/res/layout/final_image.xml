@@ -85,7 +85,7 @@
             android:layout_gravity="center_horizontal"
             android:padding="15dp"
             android:layout_weight="1"
-            android:background="#83B59C"
+            android:background="#F9D0E1"
             android:drawableRight="@drawable/yes" />
 
         <Button
@@ -95,7 +95,7 @@
             android:layout_gravity="center_horizontal"
             android:padding="15dp"
             android:layout_weight="1"
-            android:background="#FFB9B9"
+            android:background="#F9D0E1"
             android:drawableRight="@drawable/no" />
 
         <Button
@@ -105,7 +105,7 @@
             android:layout_gravity="center_horizontal"
             android:padding="15dp"
             android:layout_weight="1"
-            android:background="#83B59C"
+            android:background="#F9D0E1"
             android:drawableRight="@drawable/yes" />
 
 
@@ -116,7 +116,7 @@
             android:layout_gravity="center_horizontal"
             android:padding="15dp"
             android:layout_weight="1"
-           	android:background="#FFB9B9"
+           	android:background="#F9D0E1"
             android:drawableRight="@drawable/no" />
     </LinearLayout>
 </LinearLayout>    

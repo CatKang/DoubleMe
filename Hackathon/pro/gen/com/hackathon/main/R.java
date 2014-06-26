@@ -37,14 +37,14 @@ public final class R {
     }
     public static final class drawable {
         public static final int appname=0x7f020000;
-        public static final int blue=0x7f02002b;
+        public static final int blue=0x7f02002c;
         public static final int buttondouble=0x7f020001;
         public static final int buttonthree=0x7f020002;
         public static final int cancel=0x7f020003;
         public static final int chunse=0x7f020004;
         public static final int continuephoto=0x7f020005;
         public static final int cricle_button=0x7f020006;
-        public static final int darkgray=0x7f020029;
+        public static final int darkgray=0x7f02002a;
         public static final int file_share=0x7f020007;
         public static final int first=0x7f020008;
         public static final int focus_frame=0x7f020009;
@@ -71,15 +71,16 @@ public final class R {
         public static final int shadow=0x7f02001e;
         public static final int shadow_left=0x7f02001f;
         public static final int shadow_right=0x7f020020;
-        public static final int siderbarbg=0x7f020021;
-        public static final int success=0x7f020022;
-        public static final int textedge=0x7f020023;
-        public static final int up=0x7f020024;
-        public static final int welcomepicture=0x7f020025;
-        public static final int white=0x7f02002a;
-        public static final int whitebiankuang=0x7f020026;
-        public static final int xiangji=0x7f020027;
-        public static final int yes=0x7f020028;
+        public static final int showdoubleyou=0x7f020021;
+        public static final int siderbarbg=0x7f020022;
+        public static final int success=0x7f020023;
+        public static final int textedge=0x7f020024;
+        public static final int up=0x7f020025;
+        public static final int welcomepicture=0x7f020026;
+        public static final int white=0x7f02002b;
+        public static final int whitebiankuang=0x7f020027;
+        public static final int xiangji=0x7f020028;
+        public static final int yes=0x7f020029;
     }
     public static final class id {
         public static final int buttonBottomCancel=0x7f08000b;
