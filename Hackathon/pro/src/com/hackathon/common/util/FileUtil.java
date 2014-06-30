@@ -9,7 +9,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.hackathon.activity.HachathonMainActivity;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -25,7 +29,7 @@ public class FileUtil {
 			+ "/HeyingCamera";
 	private static String schedul_path = "schedul.txt";
 	private static String evn_log_path = "/env.txt";
-	
+
 	public static String getFilePathByType(String type) {
 		String path = root_dir;
 		if ("right".equals(type))
@@ -49,11 +53,11 @@ public class FileUtil {
 		else if ("final_right_tmp".equals(type))
 			path += "/camera_final_right_tmp.jpg";
 		else if ("final".equals(type))
-			return final_dir + "/"+ System.currentTimeMillis()+"final.jpg";
+			return final_dir + "/" + System.currentTimeMillis() + "final.jpg";
 		else if ("final_record_left".equals(type))
-			path += "/"+ System.currentTimeMillis()+"final_left.jpg";
+			path += "/" + System.currentTimeMillis() + "final_left.jpg";
 		else if ("final_record_right".equals(type))
-			path += "/"+ System.currentTimeMillis()+"final_right.jpg";
+			path += "/" + System.currentTimeMillis() + "final_right.jpg";
 		else
 			return null;
 		return path;
@@ -68,8 +72,9 @@ public class FileUtil {
 		if (!fdir.exists())
 			fdir.mkdir();
 		File env_log = new File(root_dir + evn_log_path);
-		if(env_log.exists())
+		if (env_log.exists())
 			env_log.delete();
+
 		clearCache();
 	}
 
@@ -117,7 +122,8 @@ public class FileUtil {
 		try {
 			for (int i = 0; i < oldFile.length; i++) {
 				String fineName = oldFile[i].getName();
-				String fileType = fineName.substring(fineName.lastIndexOf(".")+1, fineName.length());
+				String fileType = fineName.substring(
+						fineName.lastIndexOf(".") + 1, fineName.length());
 				if ("jpg".equals(fileType))
 					oldFile[i].delete();
 			}
@@ -143,33 +149,33 @@ public class FileUtil {
 		}
 	}
 
-	
-	public static void readSchedule()
-	{
-		//TODO read from file
-		
-		
+	public static void readSchedule() {
+		// TODO read from file
+
 	}
-	
-	public static void recordSupportSize(List<Camera.Size> pre_size, List<Camera.Size> pic_size)
-	{
-		
+
+	public static void recordSupportSize(List<Camera.Size> pre_size,
+			List<Camera.Size> pic_size) {
+
 		recordEnv("***************preview size*************");
-		for (Size one_size : pre_size) {	
-			recordEnv("PreviewSupportSize: ("+ one_size.width + " , " + one_size.height +") radio : " + ((double)one_size.width/(double)one_size.height));
+		for (Size one_size : pre_size) {
+			recordEnv("PreviewSupportSize: (" + one_size.width + " , "
+					+ one_size.height + ") radio : "
+					+ ((double) one_size.width / (double) one_size.height));
 		}
 		recordEnv("***************picture size*************");
-		for (Size one_size : pic_size) {	
-			recordEnv("PictureSupportSize: ("+ one_size.width + " , " + one_size.height +") radio : " + ((double)one_size.width/(double)one_size.height));
+		for (Size one_size : pic_size) {
+			recordEnv("PictureSupportSize: (" + one_size.width + " , "
+					+ one_size.height + ") radio : "
+					+ ((double) one_size.width / (double) one_size.height));
 		}
 	}
-	
-	public static void recordEnv(String content)
-	{
+
+	public static void recordEnv(String content) {
 		try {
 			File saveFile = new File(root_dir, evn_log_path);
-			FileOutputStream outStream = new FileOutputStream(saveFile,true);
-			outStream.write((content+"\r\n").getBytes());
+			FileOutputStream outStream = new FileOutputStream(saveFile, true);
+			outStream.write((content + "\r\n").getBytes());
 			outStream.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -177,37 +183,37 @@ public class FileUtil {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally
-		{
-			
+		} finally {
+
 		}
 	}
-	
-//	public static void memoryImages() {
-//		Bitmap target_whole = loadBitmapFromFile("whole");
-//		Bitmap target_cur = Bitmap.createBitmap(target_whole, 0,0, curFrameX - viewX + dx, imageSizeY);
-//				 memory(file_path, target_cur);
-//				 }
-//				 Bitmap target_left = BitmapFactory.decodeFile(strCaptureFilePathLeft);
-//				 memory(root_dir + "/ImageLeft_" + System.currentTimeMillis() +
-//				 ".jpg",target_left);
-//				 Bitmap target_right = BitmapFactory.decodeFile(strCaptureFilePathRight);
-//				 memory(root_dir + "/ImageRight_" + System.currentTimeMillis() +
-//				 ".jpg",target_right);
-//		//memory(root_dir + "/ImageLeft_" + System.currentTimeMillis() + ".jpg",
-//		//		target_whole);
-//		for (int dx = 100; dx <= 100; dx += 100) {
-//			String file_path = root_dir + "/ImagePart_" + dx
-//					+ System.currentTimeMillis() + ".jpg";
-//		}
-//		
-//		Bitmap target_right = loadBitmapFromFile("final_right");
-//		memory(root_dir + "/ImageRight_" + System.currentTimeMillis() + ".jpg",
-//				target_right);
-//		
-//	}
-//	 
-//	
-//	
-//	 }
+
+	// public static void memoryImages() {
+	// Bitmap target_whole = loadBitmapFromFile("whole");
+	// Bitmap target_cur = Bitmap.createBitmap(target_whole, 0,0, curFrameX -
+	// viewX + dx, imageSizeY);
+	// memory(file_path, target_cur);
+	// }
+	// Bitmap target_left = BitmapFactory.decodeFile(strCaptureFilePathLeft);
+	// memory(root_dir + "/ImageLeft_" + System.currentTimeMillis() +
+	// ".jpg",target_left);
+	// Bitmap target_right = BitmapFactory.decodeFile(strCaptureFilePathRight);
+	// memory(root_dir + "/ImageRight_" + System.currentTimeMillis() +
+	// ".jpg",target_right);
+	// //memory(root_dir + "/ImageLeft_" + System.currentTimeMillis() + ".jpg",
+	// // target_whole);
+	// for (int dx = 100; dx <= 100; dx += 100) {
+	// String file_path = root_dir + "/ImagePart_" + dx
+	// + System.currentTimeMillis() + ".jpg";
+	// }
+	//
+	// Bitmap target_right = loadBitmapFromFile("final_right");
+	// memory(root_dir + "/ImageRight_" + System.currentTimeMillis() + ".jpg",
+	// target_right);
+	//
+	// }
+	//
+	//
+	//
+	// }
 }

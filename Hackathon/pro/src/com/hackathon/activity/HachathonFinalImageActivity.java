@@ -366,7 +366,8 @@ public class HachathonFinalImageActivity extends Activity {
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		paintCropBox();
+		if (hasFocus)
+			paintCropBox();
 		super.onWindowFocusChanged(hasFocus);
 	}
 

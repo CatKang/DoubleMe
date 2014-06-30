@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +22,7 @@ import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -48,7 +50,7 @@ import com.hackathon.view.FocusBoxView;
 import com.hackathon.worker.HkExceptionHandler;
 
 public class HachathonMainActivity extends Activity implements
-		SurfaceHolder.Callback,OnTouchListener {
+		SurfaceHolder.Callback, OnTouchListener {
 	private static String TAG = "HMainActivity";
 	private SurfaceView surfaceView;
 	private Camera camera;
@@ -67,21 +69,21 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView takephotoButtonBG;
 	private TouchFocusListener touchFocusListener;
 	private FocusBoxView focusBoxView;
-	
+
 	HkWindow curWindow;
 	int flag = 0;
 	Size pictureSize;
 	Size previewSize;
 	int windowSize_width;
 	int windowSize_height;
-	
+
 	// for frame drag
 	boolean isSetFrame = false, can_drag = true;
 	int lastX, lastY;
 	TextView text;
 	// for frame drag end
 	Log log_file = null;
-	
+
 	int exitTime = 0;
 
 	@Override
@@ -105,18 +107,20 @@ public class HachathonMainActivity extends Activity implements
 		text.setVisibility(View.VISIBLE);
 		xiangjiImage = (ImageView) findViewById(R.id.imageXiangji);
 		moveImage = (ImageView) findViewById(R.id.imageMove);
-		//picFrameImageL = (ImageView) findViewById(R.id.picFrameImageL);
-		//picFrameImageR = (ImageView) findViewById(R.id.picFrameImageR);
-		//picFrameImageL.setVisibility(View.VISIBLE);
-		//picFrameImageR.setVisibility(View.GONE);
+		// picFrameImageL = (ImageView) findViewById(R.id.picFrameImageL);
+		// picFrameImageR = (ImageView) findViewById(R.id.picFrameImageR);
+		// picFrameImageL.setVisibility(View.VISIBLE);
+		// picFrameImageR.setVisibility(View.GONE);
 		// moveImage.setBackgroundResource(R.drawable.bai);
 		surfaceView = (SurfaceView) this.findViewById(R.id.camera);
 		focusBoxView = (FocusBoxView) this.findViewById(R.id.focusBoxView);
-		
-		
-		
+
+		DisplayMetrics metric = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metric);
+		windowSize_width = metric.widthPixels; // 屏幕宽度（像素）
+		windowSize_height = metric.heightPixels; // 屏幕高度（像素）
+
 		takephotoButton.setOnClickListener(new OnClickListener() {
-		
 
 			public void onClick(View v) {
 				if (!takephotoButton.isEnabled())
@@ -128,7 +132,7 @@ public class HachathonMainActivity extends Activity implements
 					camera.takePicture(shutterCallback, rawCallback,
 							jpegCallback);
 					can_drag = false;
-					
+
 					// camera.stopPreview();
 					// camera.startPreview();
 				} else if (flag == 1) {
@@ -138,14 +142,13 @@ public class HachathonMainActivity extends Activity implements
 					// picFrameImageL.setVisibility(View.GONE);
 					// picFrameImageR.setVisibility(View.VISIBLE);
 
-					
-//					Camera.Parameters parameters = camera.getParameters();
-//					if (parameters.isAutoExposureLockSupported()) {
-//						
-//						//parameters.setAutoExposureLock(false);
-//					}else{
-//						log_file.saveLog("do not support exposure lock!");
-//					}
+					// Camera.Parameters parameters = camera.getParameters();
+					// if (parameters.isAutoExposureLockSupported()) {
+					//
+					// //parameters.setAutoExposureLock(false);
+					// }else{
+					// log_file.saveLog("do not support exposure lock!");
+					// }
 					camera.takePicture(shutterCallback, rawCallback,
 							jpegCallback);
 				}
@@ -171,11 +174,11 @@ public class HachathonMainActivity extends Activity implements
 				// jpegCallback);
 				// }
 				// flag++;
-				
+
 			}
 		});
 		surfaceView.setOnTouchListener(this);
-		//surfaceView.seton
+		// surfaceView.seton
 		SurfaceHolder holder = surfaceView.getHolder();
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		holder.addCallback(this);
@@ -186,67 +189,86 @@ public class HachathonMainActivity extends Activity implements
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			//Toast.makeText(this, "后退键", Toast.LENGTH_SHORT).show();
+			// Toast.makeText(this, "后退键", Toast.LENGTH_SHORT).show();
 			switch (flag) {
 			case 0:
-				if (exitTime == 0)
-				{
-					Toast.makeText(getApplicationContext(), "再按一次退出程序", 30).show();
+				if (exitTime == 0) {
+					Toast.makeText(getApplicationContext(), "再按一次退出程序", 30)
+							.show();
 					exitTime = 1;
 					Timer mTimer = new Timer();
-					mTimer.schedule(new TimerTask() {              
-					            public void run() {  
-					            	 Looper.prepare();
-					            	if (exitTime == 1)
-					            		exitTime = 0;    
-					                 Looper.loop();
+					mTimer.schedule(new TimerTask() {
+						public void run() {
+							Looper.prepare();
+							if (exitTime == 1)
+								exitTime = 0;
+							Looper.loop();
 
-					            }   
-					        }, 2000);   
-				}
-				else
-				{
+						}
+					}, 2000);
+				} else {
 					HachathonMainActivity.this.finish();
-				}	
+				}
 				return true;
 			case 1:
 				setStatus("initial");
-				//finish();
+				// finish();
 				break;
 			}
 			return true;
-		}else if (keyCode == KeyEvent.KEYCODE_HOME)
-		{
-			moveTaskToBack(true);  
-            return true;  
+		} else if (keyCode == KeyEvent.KEYCODE_HOME) {
+			moveTaskToBack(true);
+			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
 
 	private void initial() {
-		FileUtil.init_file_env();
-		log_file = new Log();
+		try {
+			
+			FileUtil.init_file_env();
+			log_file = new Log();
+		} catch (Exception e) {
+			log_file.saveLog(e, "initial");
+			new AlertDialog.Builder(this)
+			.setTitle("无法打开")
+			.setMessage("请确定已获得存储设备访问权限")
+			.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog,
+								int which) {
+							// 点击“确认”后的操作
+							HachathonMainActivity.this.finish();
+
+						}
+					}).show();
+		}
 	}
 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
-		
-		setStatus("initial");
+		if (hasFocus)
+			setStatus("initial");
 		super.onWindowFocusChanged(hasFocus);
 	}
 
-	
-	
 	private void setStatus(String input) {
 		if ("initial".equals(input)) {
 			flag = 0;
-			//takephotoButton.setEnabled(true);
-			windowSize_width = getWindowManager().getDefaultDisplay()
-					.getWidth();
-			windowSize_height = getWindowManager().getDefaultDisplay()
-					.getHeight();
-			//takephotoButton.setY((windowSize_height - 50) / 2 - 50);
-			//设置外边框
+			// takephotoButton.setEnabled(true);
+			// windowSize_width = getWindowManager().getDefaultDisplay()
+			// .getWidth();
+
+			// windowSize_height = getWindowManager().getDefaultDisplay()
+			// .getHeight();
+			FileUtil.recordEnv("WindowSize: (" + windowSize_width + " , "
+					+ windowSize_height + ")");
+			log_file.saveLog("windwo width :" + windowSize_width + "height :"
+					+ windowSize_height);
+			// takephotoButton.setY((windowSize_height - 50) / 2 - 50);
+			// 设置外边框
 			GeometryUtil.uniformScale(previewSize, windowSize_width,
 					windowSize_height);
 			surfaceView.setLayoutParams(new FrameLayout.LayoutParams(
@@ -255,18 +277,19 @@ public class HachathonMainActivity extends Activity implements
 					previewSize.width, previewSize.height));
 			curWindow = new HkWindow(surfaceView, previewSize.width,
 					previewSize.height);
-			
-			//设置对焦框
-			touchFocusListener = new TouchFocusListener(curWindow, camera, focusBoxView, log_file); 		
+
+			// 设置对焦框
+			touchFocusListener = new TouchFocusListener(curWindow, camera,
+					focusBoxView, log_file);
 			touchFocusListener.refreshFocusBox(flag);
-			
-			//设置左右图框
+
+			// 设置左右图框
 			left.setLayoutParams(new LinearLayout.LayoutParams(
 					curWindow.viewWidth / 2, curWindow.viewHeight));
 			right.setLayoutParams(new LinearLayout.LayoutParams(
 					curWindow.viewWidth / 2, curWindow.viewHeight));
-			
-			//设置照相按钮
+
+			// 设置照相按钮
 			int siderbar_width = curWindow.siderBarWidth;
 			takephotoButton.setLayoutParams(new FrameLayout.LayoutParams(
 					siderbar_width, siderbar_width));
@@ -274,21 +297,20 @@ public class HachathonMainActivity extends Activity implements
 					siderbar_width, previewSize.height));
 			takephotoButton.setX(previewSize.width - siderbar_width);
 			takephotoButton.setY(previewSize.height / 2 - siderbar_width / 2);
-			takephotoButtonBG.setX(previewSize.width -siderbar_width);
-			
-			//设置显示图层
+			takephotoButtonBG.setX(previewSize.width - siderbar_width);
+
+			// 设置显示图层
 			leftImage.setVisibility(View.GONE);
 			rightImage.setVisibility(View.VISIBLE);
-			rightImage
-					.setBackgroundResource(R.drawable.shadow_right);
+			rightImage.setBackgroundResource(R.drawable.shadow_right);
 			moveImage.setVisibility(View.VISIBLE);
 			floatImage.setVisibility(View.INVISIBLE);
-			//xiangjiImage.setVisibility(View.GONE);
-			//picFrameImageL.setVisibility(View.VISIBLE);
-			//picFrameImageR.setVisibility(View.GONE);
+			// xiangjiImage.setVisibility(View.GONE);
+			// picFrameImageL.setVisibility(View.VISIBLE);
+			// picFrameImageR.setVisibility(View.GONE);
 			can_drag = true;
-			//camera.startPreview();
-			
+			// camera.startPreview();
+
 		}
 	}
 
@@ -299,30 +321,51 @@ public class HachathonMainActivity extends Activity implements
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 自动生成方法存根
 
-		camera = Camera.open();
+		try {
+			camera = Camera.open();
+
+		} catch (Exception e) {
+			// TODO 自动生成 catch 块
+			// e.printStackTrace();
+			log_file.saveLog(e, "surfaceCreated");
+			new AlertDialog.Builder(this)
+					.setTitle("无法打开")
+					.setMessage("请确定已获得相机权限")
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// 点击“确认”后的操作
+									HachathonMainActivity.this.finish();
+
+								}
+							}).show();
+			return;
+		}
+
 		try {
 			camera.setPreviewDisplay(holder);
 			Camera.Parameters parameters = camera.getParameters();
-			//parameters.setPictureFormat(PixelFormat.);
-			//parameters.getSupportedPictureFormats();
+			// parameters.setPictureFormat(PixelFormat.);
+			// parameters.getSupportedPictureFormats();
 			List<Camera.Size> s_previewSize = parameters
 					.getSupportedPreviewSizes();
 			List<Camera.Size> s_pictureSize = parameters
 					.getSupportedPictureSizes();
 			boolean vet = setPreveiewAndPictureSize(s_previewSize,
 					s_pictureSize, windowSize_height);
-			
+
 			// record env.log
 			FileUtil.recordSupportSize(s_previewSize, s_pictureSize);
 			FileUtil.recordEnv("PreviewSize: (" + previewSize.width + " , "
 					+ previewSize.height + ")");
 			FileUtil.recordEnv("PictureSize: (" + pictureSize.width + " , "
 					+ pictureSize.height + ")");
-			FileUtil.recordEnv("WindowSize: (" + windowSize_width + " , "
-					+ windowSize_height + ")");
 
 			parameters.setPreviewSize(previewSize.width, previewSize.height);
-			
+
 			try {
 				parameters
 						.setPictureSize(pictureSize.width, pictureSize.height);
@@ -335,7 +378,7 @@ public class HachathonMainActivity extends Activity implements
 			}
 		} catch (IOException e) {
 			// TODO 自动生成 catch 块
-			//e.printStackTrace();
+			// e.printStackTrace();
 			log_file.saveLog(e, "surfaceCreated");
 		}
 		camera.startPreview();
@@ -343,7 +386,7 @@ public class HachathonMainActivity extends Activity implements
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		//Toast.makeText(getApplicationContext(), "surfaceStop", 100).show();
+		// Toast.makeText(getApplicationContext(), "surfaceStop", 100).show();
 		// TODO 自动生成方法存根
 		if (camera != null) {
 
@@ -355,21 +398,24 @@ public class HachathonMainActivity extends Activity implements
 
 	private ShutterCallback shutterCallback = new ShutterCallback() {
 		public void onShutter() {
-			//Toast.makeText(getApplicationContext(), "shutterCallback", 100).show();
+			// Toast.makeText(getApplicationContext(), "shutterCallback",
+			// 100).show();
 		}
 	};
 
 	private PictureCallback rawCallback = new PictureCallback() {
 		public void onPictureTaken(byte[] _data, Camera _camera) {
 			// TODO Handle RAW image data
-			//Toast.makeText(getApplicationContext(), "rawcallback", 100).show();
+			// Toast.makeText(getApplicationContext(), "rawcallback",
+			// 100).show();
 		}
 	};
 
 	private PictureCallback jpegCallback = new PictureCallback() {
 
 		public void onPictureTaken(byte[] _data, Camera _camera) {
-			//Toast.makeText(getApplicationContext(), "jpegCallback", 100).show();
+			// Toast.makeText(getApplicationContext(), "jpegCallback",
+			// 100).show();
 			// Toast.makeText(getApplicationContext(), "jepgCallback",
 			// 100).show();
 
@@ -398,8 +444,8 @@ public class HachathonMainActivity extends Activity implements
 				leftImage.setImageBitmap(targetbm_left);
 				// xiangjiImage.setVisibility(View.VISIBLE);
 				moveImage.setVisibility(View.GONE);
-				//picFrameImageL.setVisibility(View.GONE);
-				//picFrameImageR.setVisibility(View.VISIBLE);
+				// picFrameImageL.setVisibility(View.GONE);
+				// picFrameImageR.setVisibility(View.VISIBLE);
 				rightImage.setVisibility(View.INVISIBLE);
 				floatImage.setVisibility(View.INVISIBLE);
 				// rightImage.setBackgroundColor(Color.BLACK);
@@ -422,8 +468,8 @@ public class HachathonMainActivity extends Activity implements
 						moveImage.setVisibility(View.VISIBLE);
 						floatImage.setVisibility(View.INVISIBLE);
 						xiangjiImage.setVisibility(View.GONE);
-						//picFrameImageL.setVisibility(View.VISIBLE);
-						//picFrameImageR.setVisibility(View.GONE);
+						// picFrameImageL.setVisibility(View.VISIBLE);
+						// picFrameImageR.setVisibility(View.GONE);
 						flag = 0;
 						can_drag = true;
 						camera.startPreview();
@@ -432,7 +478,8 @@ public class HachathonMainActivity extends Activity implements
 				});
 				Camera.Parameters parameters = camera.getParameters();
 				if (parameters.isAutoExposureLockSupported()) {
-					//Toast.makeText(getApplicationContext(), "support expoure lock", 100).show();
+					// Toast.makeText(getApplicationContext(),
+					// "support expoure lock", 100).show();
 					parameters.setAutoExposureLock(true);
 					camera.setParameters(parameters);
 				}
@@ -440,9 +487,9 @@ public class HachathonMainActivity extends Activity implements
 				camera.stopPreview();
 				camera.startPreview();
 				text.setVisibility(View.INVISIBLE);
-//				targetbm_left.recycle();
-//				targetbm_right.recycle();
-//				bm.recycle();
+				// targetbm_left.recycle();
+				// targetbm_right.recycle();
+				// bm.recycle();
 				takephotoButton.setEnabled(true);
 			} else {
 				flag = 0;
@@ -451,36 +498,35 @@ public class HachathonMainActivity extends Activity implements
 				Bitmap targetbm_right = Bitmap.createBitmap(bm, sizes.x,
 						sizes.y, sizes.width, sizes.height);
 				String path = FileUtil.memoryOneImage(targetbm_right, "right");
-				
+
 				Intent finalImageIntent = new Intent(
 						HachathonMainActivity.this,
 						HachathonFinalImageActivity.class);
 				finalImageIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 				finalImageIntent.putExtra("HkWindow", curWindow);
 				startActivity(finalImageIntent);
-				if(camera!=null)
-				{
+				if (camera != null) {
 					camera.release();
 				}
 				HachathonMainActivity.this.finish();
-//				targetbm_right.recycle();
-//				bm.recycle();
+				// targetbm_right.recycle();
+				// bm.recycle();
 			}
-			
+
 		}
 	};
 
 	public boolean onTouch(View v, MotionEvent event) {
-//		if (mGestureDetector == null)
-//			return true;
-//		mGestureDetector.onTouchEvent(event);
+		// if (mGestureDetector == null)
+		// return true;
+		// mGestureDetector.onTouchEvent(event);
 		if (MotionEvent.ACTION_DOWN == event.getAction())
 			touchFocusListener.onTouch(v, event);
-		
+
 		if (!can_drag)
 			return false;
 		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:		
+		case MotionEvent.ACTION_DOWN:
 			lastX = (int) event.getRawX();
 			lastY = (int) event.getRawY();
 			if (curWindow.onFrame(lastX, lastY))
@@ -509,7 +555,7 @@ public class HachathonMainActivity extends Activity implements
 			curWindow.curFrameX += dx;
 			if (Math.abs(dx) > 20)
 				touchFocusListener.refreshFocusBox(flag);
-			
+
 			lastX = cx;
 			lastY = cy;
 			// text.setText("curFrameX:" + curWindow.curFrameX + "   cx:" + cx
@@ -552,6 +598,9 @@ public class HachathonMainActivity extends Activity implements
 						/ (double) preSize.height;
 				if (Math.abs(preRatio - windowSize_ratio) - tolerance_cur > precision)
 					continue;
+				log_file.saveLog("preSize :" + preRatio + " tolerance_cur : "
+						+ tolerance_cur + "windowSize_ratio: "
+						+ windowSize_ratio);
 				// 找到最可接受的preview size， 用这个size 尝试去找同比例的picture size
 				int min_diff = target_pic_height;
 				Size cur_best_pic = null;
@@ -580,10 +629,4 @@ public class HachathonMainActivity extends Activity implements
 		return false;
 	}
 
-	
-	
-
-	
-	
-	
 }
