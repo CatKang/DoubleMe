@@ -39,7 +39,7 @@ public class HachathonFirstActivity extends Activity
 					startActivity(intent);
 //				}
 			}
-		}, 1000);
+		}, 400);
 //		doubleButton = (ImageButton)findViewById(R.id.buttondouble);
 //		doubleButton.setOnClickListener(new OnClickListener() {
 //			
@@ -64,25 +64,25 @@ public class HachathonFirstActivity extends Activity
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (exitTime == 0)
-			{
-				Toast.makeText(getApplicationContext(), "再按一次退出程序", 30).show();
-				exitTime = 1;
-				Timer mTimer = new Timer();
-				mTimer.schedule(new TimerTask() {              
-				            public void run() {  
-				            	 Looper.prepare();
-				            	if (exitTime == 1)
-				            		exitTime = 0;    
-				                 Looper.loop();
-
-				            }   
-				        }, 2000);   
-			}
-			else
-			{
-				HachathonFirstActivity.this.finish();
-			}	
+//			if (exitTime == 0)
+//			{
+//				Toast.makeText(getApplicationContext(), "再按一次退出程序", 30).show();
+//				exitTime = 1;
+//				Timer mTimer = new Timer();
+//				mTimer.schedule(new TimerTask() {              
+//				            public void run() {  
+//				            	 Looper.prepare();
+//				            	if (exitTime == 1)
+//				            		exitTime = 0;    
+//				                 Looper.loop();
+//
+//				            }   
+//				        }, 2000);   
+//			}
+//			else
+//			{
+				//HachathonFirstActivity.this.finish();
+			//}	
 			return true;
 		}else if (keyCode == KeyEvent.KEYCODE_HOME)
 		{

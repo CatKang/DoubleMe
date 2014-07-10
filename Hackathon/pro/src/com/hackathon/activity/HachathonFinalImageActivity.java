@@ -58,7 +58,7 @@ public class HachathonFinalImageActivity extends Activity {
 	private CropBoxView cropBoxView;
 	
 	private FinalImageWindow finalImageWindow;
-	public ImageSize cropBox = null;
+	//public ImageSize cropBox = null;
 	private TextView finaltext;
 
 	private final float MOVEREMAINSCALE = (float) 0.2; // 移动后留在屏幕内部的比例
@@ -246,7 +246,15 @@ public class HachathonFinalImageActivity extends Activity {
 				if (!buttonBottomSave.isEnabled())
 					return;
 				buttonBottomSave.setEnabled(false);
-				Bitmap final_bitmap = FileUtil.loadBitmapFromFile("final_tmp");
+				Bitmap final_bitmap =null;
+				if(conjunct_succ_ret == 0)
+				{
+					final_bitmap = FileUtil.loadBitmapFromFile("final_tmp");
+				}
+				else
+				{
+					final_bitmap = FileUtil.loadBitmapFromFile("final_direct");
+				}
 				String path = FileUtil.memoryOneImage(final_bitmap, "final");
 				Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);     
 				Uri uri = Uri.fromFile(new File(path));   
@@ -470,8 +478,9 @@ public class HachathonFinalImageActivity extends Activity {
 		finalImageWindow = new FinalImageWindow(view_width, view_height);
 		finalImageWindow.leftWidth = left_view_width;
 		cropBoxView.setLeftWidth(left_view_width);
-		if (cropBox == null)
-			cropBox = new ImageSize(0, 0, view_width, view_height);
+		cropBoxView.initialCropArea(new ImageSize(0, 0, view_width, view_height));
+//		if (cropBox == null)
+//			cropBox = new ImageSize(0, 0, view_width, view_height);
 
 		// get image
 		Matrix right_matrix = new Matrix();
@@ -510,7 +519,7 @@ public class HachathonFinalImageActivity extends Activity {
 		ImageSize size_left = sizes.get(0);
 		ImageSize size_right = sizes.get(1);
 		myImageFinalRight.setDrawingCacheEnabled(false);
-		cropBox.change(size_left.x, size_left.y, size_left.width - MOREPIX
+		cropBoxView.cropArea.change(size_left.x, size_left.y, size_left.width - MOREPIX
 				+ size_right.width, size_right.height);
 		cropBoxView.setLeftWidth(size_left.width - MOREPIX);
 		// cropBox.change(finalImageWindow.viewX + size_left.x,
@@ -522,15 +531,22 @@ public class HachathonFinalImageActivity extends Activity {
 
 	private void paintCropBox() {
 		//int out_width = cropBoxView.getBorderwidth();
-		int out_width = 0;
 		// Toast.makeText(getApplicationContext(), cropBox.x + "," + cropBox.y +
 		// ", "+ cropBox.width + ", "+ cropBox.height , 500).show();
-		cropBoxView.setX(cropBox.x - out_width);
-		cropBoxView.setY(cropBox.y - out_width);
+//		cropBoxView.setX(cropBox.x);
+//		cropBoxView.setY(cropBox.y);
 		// cropBoxView.setLayoutParams(new
 		// LinearLayout.LayoutParams(cropBox.width, cropBox.height) );
-		cropBoxView.setLayoutParams(new FrameLayout.LayoutParams(cropBox.width + 2 * out_width,
-				cropBox.height + 2 * out_width));
+//		cropBoxView.setLayoutParams(new FrameLayout.LayoutParams(cropBox.width,
+//				cropBox.height));
+		
+		
+		cropBoxView.setX(0);
+		cropBoxView.setY(0);
+		// cropBoxView.setLayoutParams(new
+		// LinearLayout.LayoutParams(cropBox.width, cropBox.height) );
+		cropBoxView.setLayoutParams(new FrameLayout.LayoutParams(finalImageWindow.viewWidth,
+				finalImageWindow.viewHeight));
 		cropBoxView.invalidate();
 		
 	}

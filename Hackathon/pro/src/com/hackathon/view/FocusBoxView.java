@@ -1,5 +1,6 @@
 package com.hackathon.view;
 
+import com.hackathon.common.util.BitmapUtil;
 import com.hackathon.entity.FinalImageWindow;
 import com.hackathon.main.R;
 
@@ -55,10 +56,13 @@ public class FocusBoxView  extends ImageView {
     }
     @Override  
     protected void onDraw(Canvas canvas) {  
-        super.onDraw(canvas);  
-        Bitmap bmp=BitmapFactory.decodeResource(res, pic);
-        canvas.drawBitmap(bmp, new Matrix(), null);
         
+        Bitmap bmp=BitmapFactory.decodeResource(res, pic);
+        int cwidth = this.getWidth();
+        int cheight = this.getHeight();
+        Bitmap resize_bmp = BitmapUtil.resizeBitmap(bmp, cwidth,cheight);
+        canvas.drawBitmap(resize_bmp, new Matrix(), null);
+        super.onDraw(canvas); 
 //        Rect rec = canvas.getClipBounds(); 
 //      //设置边框颜色  
 //        Paint paint = new Paint(); 

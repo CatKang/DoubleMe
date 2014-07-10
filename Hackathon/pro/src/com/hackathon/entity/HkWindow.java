@@ -24,7 +24,7 @@ public class HkWindow implements Serializable{
 	
 	public double onFrameThresholdRadio = 0.03; // 认为在边框上的阈值
 	public double insideThresholdRadio = 0.3; // 认为在边框上的阈值
-	public double siderBarRadio = 0.1;
+	public double siderBarRadio = 0.09;
 	
 	public int siderBarWidth;
 	public int onFrameThreshold; // 认为在边框上的阈值

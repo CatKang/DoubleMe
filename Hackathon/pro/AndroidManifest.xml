@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hackathon.main"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="4"
+    android:versionName="1.0.12" >
 
     <uses-sdk android:minSdkVersion="10" />
 
@@ -14,6 +14,9 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
+    
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 	<supports-screens 
 	   android:smallScreens="true" 
 	   android:normalScreens="true" 
@@ -25,6 +28,18 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
          >
+         <meta-data android:value="53bec98356240bd84e124d19" android:name="UMENG_APPKEY"/>
+         <meta-data android:value="Channel ID" android:name="UMENG_CHANNEL"/>
+         <service
+    android:name="com.umeng.update.net.DownloadingService"
+    android:process=":DownloadingService" >
+</service>
+<activity 
+    android:name="com.umeng.update.UpdateDialogActivity"
+    android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+</activity>
+         
+         
         <activity
             android:name="com.hackathon.activity.HachathonFirstActivity"
             android:label="@string/app_name"

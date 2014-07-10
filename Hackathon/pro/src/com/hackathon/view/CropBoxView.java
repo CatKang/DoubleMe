@@ -1,8 +1,13 @@
 package com.hackathon.view;
 
 import com.hackathon.entity.FinalImageWindow;
+import com.hackathon.entity.ImageSize;
+import com.hackathon.main.R;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -20,9 +25,17 @@ public class CropBoxView  extends ImageView {
     
 
 	private int leftWidth;
-    
-   
 	
+	public ImageSize cropArea = null;
+    
+	public void initialCropArea(ImageSize cropArea) {
+		if (this.cropArea == null)
+			this.cropArea = cropArea;
+	}
+	
+	public void setCropArea(ImageSize cropArea) {
+		this.cropArea = cropArea;
+	}
 	public CropBoxView(Context context) {  
         super(context);  
     }  
@@ -54,13 +67,15 @@ public class CropBoxView  extends ImageView {
     protected void onDraw(Canvas canvas) {  
         super.onDraw(canvas);  
         // 画边框  
-        
-        Rect rec = canvas.getClipBounds(); 
+//        if(cropArea == null)
+//        	return;
+//        Rect rec = canvas.getClipBounds(); 
+        Rect rec = new Rect(this.cropArea.x, this.cropArea.y, cropArea.x + this.cropArea.width, cropArea.y + this.cropArea.height);
       //设置边框颜色  
         Paint paint = new Paint(); 
         paint.setColor(co);  
         paint.setStyle(Paint.Style.STROKE); 
-
+       
         //画角
         this.drawCorner(canvas, paint, rec);
         
@@ -74,13 +89,17 @@ public class CropBoxView  extends ImageView {
         
         //画分割线
         this.drawSplitLine(canvas);
+        
+        
+        //画阴影
+        //this.drawBg(canvas, paint);
     }  
     
     //四个角加粗
     private void drawCorner(Canvas canvas, Paint paint, Rect rec)
     {
     	int corner_length = (int)(rec.height() * 0.15);
-    	int corner_thick = borderwidth * 4;
+    	int corner_thick = borderwidth * 2;
     	paint.setStrokeWidth(corner_thick);
     	Point left_top = new Point(rec.left, rec.top);
     	Point left_bottom = new Point(rec.left, rec.bottom);
@@ -89,15 +108,15 @@ public class CropBoxView  extends ImageView {
     	
     	//画四条横线
     	canvas.drawLine(left_top.x, left_top.y, left_top.x + corner_length, left_top.y , paint);
-    	canvas.drawLine(right_top.x - corner_length, right_top.y, right_top.x, right_top.y , paint);
+    	canvas.drawLine(right_top.x - corner_length - corner_thick, right_top.y, right_top.x, right_top.y , paint);
     	canvas.drawLine(left_bottom.x, left_bottom.y, left_bottom.x + corner_length, left_bottom.y , paint);
-    	canvas.drawLine(right_bottom.x - corner_length, right_bottom.y, right_bottom.x, right_bottom.y , paint);
+    	canvas.drawLine(right_bottom.x - corner_length - corner_thick, right_bottom.y, right_bottom.x, right_bottom.y , paint);
     	
     	//画四条竖线
     	canvas.drawLine(left_top.x, left_top.y, left_top.x, left_top.y  + corner_length, paint);
-    	canvas.drawLine(left_bottom.x, left_bottom.y - corner_length, left_bottom.x, left_bottom.y , paint);
+    	canvas.drawLine(left_bottom.x, left_bottom.y - corner_length- corner_thick, left_bottom.x, left_bottom.y , paint);
     	canvas.drawLine(right_top.x, right_top.y, right_top.x, right_top.y  + corner_length, paint);
-    	canvas.drawLine(right_bottom.x, right_bottom.y - corner_length, right_bottom.x, right_bottom.y , paint);
+    	canvas.drawLine(right_bottom.x, right_bottom.y - corner_length- corner_thick, right_bottom.x, right_bottom.y , paint);
     	
     }
     
@@ -109,13 +128,24 @@ public class CropBoxView  extends ImageView {
     	paint.setColor(Color.RED);
     	paint.setStrokeWidth(2);
     	paint.setStyle(Paint.Style.STROKE);
-    	PathEffect effects = new DashPathEffect(new float[] { 1, 2, 4, 8}, 1);  
+    	PathEffect effects = new DashPathEffect(new float[] { 5, 5, 5, 5}, 1);  
     	paint.setPathEffect(effects);  
     	//paint.setPathEffect(DashPathEffect)
     	int pointTopX = leftWidth;
-    	int pointTopY = 0;
+    	int pointTopY = cropArea.y;
     	int pointDownX = pointTopX;
-    	int pointDownY = pointTopY + canvas.getHeight();
+    	int pointDownY = pointTopY + cropArea.height;
     	canvas.drawLine(pointTopX, pointTopY, pointDownX, pointDownY, paint);
+    }
+    
+    
+    private void drawBg(Canvas canvas, Paint paint)
+    {
+    	
+//    	  Resources res=getResources();
+//    	  Bitmap bmp=BitmapFactory.decodeResource(res, R.drawable.chunse);
+//    	  paint.setAlpha(30);
+    	//  canvas.drawBitmap(bmp, 20, 20, paint);
+    	
     }
 }  

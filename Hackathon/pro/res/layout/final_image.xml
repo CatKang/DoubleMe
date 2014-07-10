@@ -95,7 +95,7 @@
             android:layout_gravity="center_horizontal"
             android:padding="15dp"
             android:layout_weight="1"
-            android:background="#F9D0E1"
+            android:background="#8D4E6E"            
             android:drawableRight="@drawable/no" />
 
         <Button
@@ -116,7 +116,7 @@
             android:layout_gravity="center_horizontal"
             android:padding="15dp"
             android:layout_weight="1"
-           	android:background="#F9D0E1"
+           	android:background="#8D4E6E"
             android:drawableRight="@drawable/no" />
     </LinearLayout>
 </LinearLayout>    

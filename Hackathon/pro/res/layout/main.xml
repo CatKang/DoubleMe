@@ -105,19 +105,14 @@
 			        android:textColor="@android:color/darker_gray"/>
             </FrameLayout>
         </LinearLayout>
-         <ImageView
-                    android:id="@+id/takephotoButtonBG"
-                    android:layout_width="60dp"
-                    android:layout_height="fill_parent"
-                     
-                      android:alpha="30"/>
+         
         <Button
 	        android:id="@+id/takephotoButton"
-	        android:layout_width="60dp"
-	        android:layout_height="60dp"
-	        android:drawableLeft="@drawable/photobutton"
+	        android:layout_width="85dp"
+	        android:layout_height="85dp"
+	        
 	        android:padding="5dp"
-	         android:background="@android:color/transparent"
+	        
 	        />
         <com.hackathon.view.FocusBoxView
             android:id="@+id/focusBoxView"

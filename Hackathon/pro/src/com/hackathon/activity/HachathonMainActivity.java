@@ -48,6 +48,7 @@ import com.hackathon.entity.ImageSize;
 import com.hackathon.main.R;
 import com.hackathon.view.FocusBoxView;
 import com.hackathon.worker.HkExceptionHandler;
+import com.umeng.update.UmengUpdateAgent;
 
 public class HachathonMainActivity extends Activity implements
 		SurfaceHolder.Callback, OnTouchListener {
@@ -66,7 +67,6 @@ public class HachathonMainActivity extends Activity implements
 	private ImageView moveImage;
 	private Button noButton;
 	private Button takephotoButton;
-	private ImageView takephotoButtonBG;
 	private TouchFocusListener touchFocusListener;
 	private FocusBoxView focusBoxView;
 
@@ -89,6 +89,7 @@ public class HachathonMainActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		UmengUpdateAgent.update(this);
 		Thread.setDefaultUncaughtExceptionHandler(new HkExceptionHandler());
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
@@ -96,7 +97,6 @@ public class HachathonMainActivity extends Activity implements
 		mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
 		frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
 		takephotoButton = (Button) findViewById(R.id.takephotoButton);
-		takephotoButtonBG = (ImageView) findViewById(R.id.takephotoButtonBG);
 		noButton = (Button) findViewById(R.id.noButton);
 		floatImage = (ImageView) findViewById(R.id.imageFloat);
 		rightImage = (ImageView) findViewById(R.id.imageRight);
@@ -293,11 +293,9 @@ public class HachathonMainActivity extends Activity implements
 			int siderbar_width = curWindow.siderBarWidth;
 			takephotoButton.setLayoutParams(new FrameLayout.LayoutParams(
 					siderbar_width, siderbar_width));
-			takephotoButtonBG.setLayoutParams(new FrameLayout.LayoutParams(
-					siderbar_width, previewSize.height));
-			takephotoButton.setX(previewSize.width - siderbar_width);
+			takephotoButton.setX(previewSize.width - (int)(siderbar_width*1.3));
 			takephotoButton.setY(previewSize.height / 2 - siderbar_width / 2);
-			takephotoButtonBG.setX(previewSize.width - siderbar_width);
+			takephotoButton.setBackgroundResource(R.drawable.photobutton);
 
 			// 设置显示图层
 			leftImage.setVisibility(View.GONE);
@@ -389,7 +387,7 @@ public class HachathonMainActivity extends Activity implements
 		// Toast.makeText(getApplicationContext(), "surfaceStop", 100).show();
 		// TODO 自动生成方法存根
 		if (camera != null) {
-
+			camera.stopPreview();
 			camera.release();
 			camera = null;
 		}
@@ -506,7 +504,9 @@ public class HachathonMainActivity extends Activity implements
 				finalImageIntent.putExtra("HkWindow", curWindow);
 				startActivity(finalImageIntent);
 				if (camera != null) {
+					camera.stopPreview();
 					camera.release();
+					camera = null;
 				}
 				HachathonMainActivity.this.finish();
 				// targetbm_right.recycle();
@@ -517,6 +517,8 @@ public class HachathonMainActivity extends Activity implements
 	};
 
 	public boolean onTouch(View v, MotionEvent event) {
+		if (camera == null)
+			return true;
 		// if (mGestureDetector == null)
 		// return true;
 		// mGestureDetector.onTouchEvent(event);
